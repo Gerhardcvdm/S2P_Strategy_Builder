@@ -1,0 +1,10 @@
+{
+  "name": "s2p-strategy",
+  "description": "S2P Strategy Builder. Derive an agentic transformation strategy, a use case portfolio and a build recommendation from a business function. Three orchestrating commands, one per deliverable, each stopping at gates only a person can rule.",
+  "version": "0.5.0",
+  "author": {
+    "name": "Gerhard van der Merwe"
+  },
+  "homepage": "https://github.com/Gerhardcvdm/S2P_Strategy_Builder",
+  "repository": "https://github.com/Gerhardcvdm/S2P_Strategy_Builder"
+}

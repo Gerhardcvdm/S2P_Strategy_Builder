@@ -1,0 +1,41 @@
+{
+  "hooks": {
+    "PreCompact": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/precompact-closeout.sh\"",
+            "timeout": 10,
+            "statusMessage": "Close-out check before compaction"
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "clear|compact|resume",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/hooks/sessionstart-resume.sh\"",
+            "timeout": 10,
+            "statusMessage": "Re-reading the resume document"
+          }
+        ]
+      }
+    ],
+    "Stop": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "bash \"${CLAUDE_PLUGIN_ROOT}/skills/arc-watcher/scripts/render-progress.sh\" >/dev/null 2>&1 || true",
+            "timeout": 15,
+            "statusMessage": "Rendering run progress"
+          }
+        ]
+      }
+    ]
+  }
+}

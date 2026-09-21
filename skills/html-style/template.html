@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Document Title</title>
+<style>
+  :root {
+    /* ground */
+    --bg: #000000;
+    --surface: #2c2e30;
+    --surface-2: #3a3b3d;
+    --border: #636466;
+
+    /* text */
+    --text: #ffffff;
+    --text-muted: #a7a8aa;
+
+    /* firm accents */
+    --accent-1: #86bc25;
+    --accent-2: #0d8390;
+    --accent-3: #007cb0;
+
+    /* corrected tones — see SKILL.md */
+    --accent-1-deep: #4a7c15;
+    --link: #5ab5e0;
+
+    /* decorative only */
+    --bright-green: #0df200;
+    --bright-teal: #3efac5;
+
+    --gradient-1: linear-gradient(135deg, var(--accent-1-deep), var(--accent-2));
+    --gradient-2: linear-gradient(135deg, var(--accent-3), var(--accent-1));
+    --shadow-glow: 0 0 40px rgba(13, 131, 144, 0.2);
+  }
+
+  * { box-sizing: border-box; }
+
+  body {
+    margin: 0;
+    padding: 40px 24px;
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Aptos', 'Aptos Display', Calibri, 'Segoe UI', system-ui, -apple-system, sans-serif;
+    line-height: 1.6;
+  }
+
+  .container { max-width: 960px; margin: 0 auto; }
+
+  /* The hero is a heading on the ground, closed by a firm-green rule. No panel, no glow:
+     screen and print are the same design. */
+  header.hero {
+    padding: 8px 0 24px;
+    border-bottom: 3px solid var(--accent-1);
+    margin-bottom: 32px;
+  }
+
+  header.hero .eyebrow {
+    margin: 0 0 10px 0;
+    font-size: 0.8rem;
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent-1);
+  }
+
+  header.hero h1 {
+    margin: 0 0 10px 0;
+    max-width: 30ch;
+    font-size: 2.6rem;
+    font-weight: 700;
+    line-height: 1.12;
+    letter-spacing: -0.01em;
+    color: var(--text);
+  }
+
+  header.hero p {
+    margin: 0;
+    color: var(--text-muted);
+    font-size: 1.05rem;
+  }
+
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 28px;
+    margin-bottom: 20px;
+  }
+
+  .card h2 { margin-top: 0; font-size: 1.3rem; font-weight: 600; }
+
+  /* Fallback colour first, so a background-clip failure degrades to visible text */
+  .accent-text {
+    color: var(--accent-1);
+    background: var(--gradient-2);
+    -webkit-background-clip: text;
+    background-clip: text;
+    font-weight: 700;
+  }
+  @supports (background-clip: text) or (-webkit-background-clip: text) {
+    .accent-text { color: transparent; }
+  }
+
+  .btn-primary {
+    display: inline-block;
+    padding: 12px 24px;
+    border-radius: 10px;
+    background: var(--gradient-1);
+    color: #fff;
+    font-weight: 600;
+    text-decoration: none;
+    border: none;
+    cursor: pointer;
+    box-shadow: var(--shadow-glow);
+  }
+
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 16px;
+  }
+
+  .stat {
+    background: var(--surface-2);
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid var(--border);
+  }
+
+  .stat .value { font-size: 1.8rem; font-weight: 700; }
+
+  .stat .label {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+
+  .table-wrap { overflow-x: auto; }
+
+  table { width: 100%; border-collapse: collapse; }
+
+  th, td {
+    text-align: left;
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  th {
+    color: var(--text-muted);
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+  }
+
+  a { color: var(--link); }
+
+  footer {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    margin-top: 40px;
+  }
+
+  /* ---- Print: invert to light, kill effects, keep blocks intact ---- */
+  @media print {
+    :root {
+      --bg: #ffffff;
+      --surface: #ffffff;
+      --surface-2: #f4f5f6;
+      --border: #c9ccce;
+      --text: #000000;
+      --text-muted: #4a4d50;
+      --link: #005f8a;
+    }
+    body { padding: 0; font-size: 10.5pt; }
+    header.hero { padding: 0 0 16px; margin-bottom: 24px; }
+    header.hero h1 { font-size: 22pt; color: #000; }
+    header.hero p { color: var(--text-muted); }
+    /* #86bc25 on white is 2.3:1; the deep tone keeps the eyebrow legible on paper */
+    header.hero .eyebrow { color: var(--accent-1-deep); }
+    .card {
+      border: 1px solid var(--border);
+      box-shadow: none;
+      break-inside: avoid;
+      page-break-inside: avoid;
+    }
+    .btn-primary { display: none; }
+    .accent-text {
+      color: var(--accent-2);
+      background: none;
+      -webkit-text-fill-color: currentColor;
+    }
+    a { color: var(--link); text-decoration: underline; }
+    a[href^="http"]::after {
+      content: " (" attr(href) ")";
+      font-size: 8pt;
+      color: #4a4d50;
+    }
+    table { break-inside: auto; }
+    tr { break-inside: avoid; }
+    thead { display: table-header-group; }
+  }
+</style>
+</head>
+<body>
+  <div class="container">
+
+    <header class="hero">
+      <p class="eyebrow">Document kind</p>
+      <h1>Document Title</h1>
+      <p>Short subtitle or description goes here.</p>
+    </header>
+
+    <div class="card">
+      <h2>Section Heading</h2>
+      <p>Body content goes here. Use <span class="accent-text">accent-text</span> spans to highlight key figures or terms.</p>
+
+      <div class="grid">
+        <div class="stat">
+          <div class="value">1,204</div>
+          <div class="label">Example Metric</div>
+        </div>
+        <div class="stat">
+          <div class="value">87%</div>
+          <div class="label">Another Metric</div>
+        </div>
+        <div class="stat">
+          <div class="value">$42.1K</div>
+          <div class="label">Third Metric</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>Data Table</h2>
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr><th>Column A</th><th>Column B</th><th>Column C</th></tr>
+          </thead>
+          <tbody>
+            <tr><td>Row 1</td><td>Value</td><td>Value</td></tr>
+            <tr><td>Row 2</td><td>Value</td><td>Value</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <footer>Generated deliverable</footer>
+
+  </div>
+</body>
+</html>

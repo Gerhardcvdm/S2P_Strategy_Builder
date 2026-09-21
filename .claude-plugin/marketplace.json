@@ -1,0 +1,13 @@
+{
+  "name": "s2p-strategy-builder",
+  "owner": { "name": "Gerhard van der Merwe" },
+  "description": "Released versions of S2P Strategy Builder. Licensed for use by invitation; see LICENSE.",
+  "plugins": [
+    {
+      "name": "s2p-strategy",
+      "source": "./",
+      "version": "0.5.0",
+      "description": "S2P Strategy Builder. Derive an agentic transformation strategy, a use case portfolio and a build recommendation from a business function. Three orchestrating commands, one per deliverable, each stopping at gates only a person can rule."
+    }
+  ]
+}
