@@ -36,10 +36,21 @@ rules, acknowledge and correct rather than revising the methodology.
 > the note's instructions, never after:
 >
 > ```bash
-> p=~/.claude/skills/use-case-portfolio-derivation
-> [ -L "$p" ] && echo "link to $(readlink "$p") — one file, nothing to sync" \
->             || echo "REAL directory — a second copy exists and it can fork"
+> n=use-case-portfolio-derivation; src=~/.claude/skills/$n/SKILL.md
+> for f in ~/.claude/skills/$n/SKILL.md ~/.claude/plugins/marketplaces/*/skills/$n/SKILL.md \
+>          ~/.claude/plugins/cache/*/*/*/skills/$n/SKILL.md .claude/skills/$n/SKILL.md; do
+>   [ -f "$f" ] || continue
+>   r=$(readlink -f "$f"); s=same; cmp -s "$f" "$src" || s=DIFFERS
+>   echo "$f -> $r  [$s]"
+> done | sort -u -t' ' -k3
 > ```
+>
+> It prints every resolvable copy and whether each matches the authoring copy. **"One file" is
+> the verdict only when the enumeration finds one.** The earlier test checked a single path for a
+> link and answered *nothing to sync* on a machine with three copies: packaging the skill as a
+> plugin had added a marketplace clone and a cache install after the test was written, and the
+> two ways to invoke the skill resolved to different files. A self-expiring check must discover
+> its subjects rather than list them, because a location added later is invisible to a list.
 >
 > **A note describing a temporary state must carry its own expiry test.** Without one it
 > outlives the state it describes — and it survives *as an instruction*, costing real work and
@@ -77,6 +88,16 @@ Start from the function and enumerate, in this order, keeping each as its own ar
 size. If it is not, the traversal stopped early. **A portfolio derived from 86 opportunities can
 say what it excluded; one derived from 20 cannot.**
 
+⚠ **The test applies on both entry paths, worded for each.** When the portfolio traverses, it is
+an instruction: keep going. When the portfolio *adopts* an opportunity layer from a completed
+strategy, it is a disclosure: state the inherited count against the expected portfolio size, and
+where the ratio is small say so as a limitation of the arc — *this portfolio can account for what it
+excluded from a field of N, and cannot say whether the field should have been larger* — as a box in
+the stop condition. An earlier version attached the test to the traversal only, which put it on the
+branch that could still act and exempted the branch that could not: an inherited field of 23
+against a reference run's 86 reconciled perfectly against a denominator nobody was allowed to
+question.
+
 **Every layer must be its own file.** The value of the chain is that a sceptic can walk it
 backwards from any entry, and that only works if the intermediate steps survive.
 
@@ -86,6 +107,29 @@ backwards from any entry, and that only works if the intermediate steps survive.
 
 **Bundle opportunities into use cases.** A use case is a unit of work with one trigger, one
 output and one verifier — **not** a theme and not a capability.
+
+⛔ **State the strictness before the first record, because the headline count is a property of the
+strictness and not of the material.** Two readings of the sentence above are equally supported:
+strict — all three must match — under which a set already derived at pain-and-task granularity
+bundles by nothing; and loose — same event class, same output shape, same verification pattern —
+under which the same set collapses by roughly half. Observed: the strict test applied to one
+population to get *23 into 23*, the loose to another to get *12 into 7*, in one file, and each
+looked locally reasonable. **The default is strict**, because it is the only reading that cannot
+silently merge two things a sponsor would fund separately — with a **merge register**: every pair
+the loose reading would bundle, named, with the reason it might be one and the reason it was left
+as two, unexecuted. Report how many merges the loose reading would have made; a portfolio whose
+two readings differ by more than a third has a denominator that needs a ruling, not a default.
+
+⛔ **On an adopted entry path, two of the three deciding fields are authored here.** An opportunity
+layer built by the strategy method carries a verifier and carries neither a trigger nor an output,
+so the test that decides the stage is two-thirds invented at the step that applies it. **State the
+derivation rule before the table** — for example, *trigger = the event that makes the entry's
+first-listed task fall due, read from the activity map; output = the artefact the entry's name
+denotes, expressed as the object the inherited verifier checks* — mark the derived columns as
+derived, and assert that each entry has exactly one trigger phrasing in the file. Observed: one
+entry given two triggers four lines apart, one phrasing used to keep it separate from a neighbour
+and the other to show the two collide, and neither checked against the other because both were
+believed inherited.
 
 **Then write the filter log, and make it exhaustive.** For all *n* original opportunities:
 
@@ -98,6 +142,25 @@ survives the longest — a reader who trusts nothing else can verify the account
 
 **Name the filters before applying them, and apply them in a fixed order.** A filter invented to
 justify a specific exclusion is not a filter.
+
+⛔ **And partition the filter set by what each filter gates, before applying any of it.** Constraints
+that all read as *this cannot happen* gate different things: **production feasibility** — can it be
+built and run — and **proof eligibility** — can it be demonstrated. Run as one funnel they answer a
+question nobody asked, whether what can be built and what can be shown are the same set; they
+usually are not. Observed: an unanswered contractual question about feeding third-party material
+to a model removed eighteen of twenty-eight candidates from *proof* eligibility, and it does not
+bind a proof at all — a ten-minute prototype runs on synthetic data and feeds no third-party
+material. The classifier is the one Phase 3 already states: **a permission constraint** (needing
+access to a system) gates production and never the proof, because synthetic inputs lose nothing;
+**a state-of-knowledge constraint** (needing not to already know the answer) gates the proof and
+cannot be waived by synthetic data. Publish both survivor sets **and their intersection**. An empty
+intersection is a first-class finding — the thing worth showing cannot yet be run — and it is a
+different conversation with a sponsor than a thin shortlist; no single funnel can express it.
+
+⚠ **A filter that takes the central proposition as its criterion is marked *conditional on the
+proposition's provenance*** in the filter log, so its cut reads as an exposure if the proposition
+falls. On one run such a filter removed half the field on a sentence the agent had drafted and
+the sponsor's proxy later set aside in a paragraph.
 
 ### ⛔ A constraint that decides whether the deliverable can exist at all is a filter, not a score
 
@@ -172,6 +235,12 @@ contains, it must include:
   the conclusion; and re-judge the dimension when something is built and run twice — the first
   scoring dimension corrected by a build rather than an argument, on the portfolio this comes from.
 - **Exposure** — what a wrong answer costs.
+- **Ownership** — who owns the process the entry changes, and who bears the hour it creates:
+  *this function*, *shared*, or *another team*. ⛔ **Phase 6's divergence test reads this field by
+  name**; an earlier version of this list omitted it while Phase 6 asked for *whatever control or
+  ownership field you already have*, and an author scanning column names declared it absent
+  although a field with that meaning was on the record under another name. A late-phase test that
+  reads an early-phase field is a requirement on the early phase, and it is written here.
 - **Demonstrability**, decomposed: can it be shown at all · does it produce visible output · can
   a non-expert judge it live · does it finish inside a meeting · **can it be shown failing**.
   The last is the one that separates a demo from a sales pitch.
@@ -282,11 +351,12 @@ evidence about the reviewer, not the portfolio.
      low.** Measured on one portfolio, an adversarial pass that named three found ten once the
      classification was completed — it sampled and generalised, which is the failure completing
      a classification exists to prevent.
-  2. **The field will look redundant against whatever control or ownership field you already
-     have, and it will not be.** In the same portfolio nine of ten crossing entries were already
-     flagged `shared` control — and the tenth, missed entirely, was the one with the most
-     headcount-shaped displacement in the portfolio. **The single divergence is the whole value
-     of the field.**
+  2. **The field will look redundant against Phase 3's ownership dimension, and it will not
+     be.** Read displacement against ownership entry by entry. In the same portfolio nine of ten
+     crossing entries were already flagged `shared` — and the tenth, missed entirely, was the one
+     with the most headcount-shaped displacement in the portfolio. **The single divergence is the
+     whole value of the field.** If the ownership dimension is absent from the record, add it now
+     and complete it on every entry, as this paragraph already says of displacement.
   3. **Displacement is not only subtraction.** Some entries *add* obligation to the affected
      population. A field recording only removed effort misses them.
 
@@ -342,6 +412,15 @@ the one being chosen.
 **So re-cost each finalist at full load: the whole cost of every shared component it touches,
 plus its own marginal cost.** Candidates that look equivalent under the scoring routinely
 differ several-fold here, because one draws on a single shared capability and another on four.
+
+⛔ **For every component this costing calls heavy, cite the upstream sentence that sized the same
+thing, by file and line, and either agree or record the disagreement as a gate item.** Two arcs
+describe one object in two units — the strategy in what it costs to *start*, this phase in what
+must be built before a saving is *claimable* — and each is right in its own file. Observed: a
+baseline register written upstream as *the cheapest thing on this page* and here as *heavier than
+anything else in the table*, uncited either way, unnoticed by the reviewer because the drivers
+page was not a declared input, and met for the first time on the sponsor's page, where a cold
+reader turned the gap into the sharpest question in the meeting. The critic checks the pair.
 
 **Then check whether ordering changes the total, and it usually does not.** Where the component
 sets overlap, the same infrastructure gets built either way. ⚠ **The defensible claim is
@@ -407,5 +486,8 @@ works there.**
 has excluded something, or is reported as unfiltered.** A portfolio in which nothing was ever
 ruled out cannot be selected from, and it will pass every other test in this list while that is
 true.
+
+**And on an adopted entry path: the inherited field size is disclosed against the expected
+portfolio size** (Phase 1), so a reader can see what the accounting could and could not question.
 
 **Until that last one, the portfolio is a well-built hypothesis.** Say so in the document.

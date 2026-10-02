@@ -245,6 +245,20 @@ prohibition do not conflict** — the prohibition simply wins.
 ⚠ **The glyph case resolves the same way.** Dense warning glyphs are a convention of *internal
 working artefacts*, not of this style, and nothing here requires them in a deliverable.
 
+⛔ **An existing page with its own token set keeps it.** This style is written for a blank page
+and will claim an existing one if allowed to; a diagramming or component skill loaded on the same
+page will do the same. When the page already carries a palette, a type stack and component CSS,
+**the hard rules still apply — self-contained, print block, contrast floors, structure — and the
+palette and components do not.** Anything a second skill embeds in that page is skinned to the
+page's variables, and any external font or script link it brings is dropped and its families
+mapped to what the page embeds, because hard rule 1 wins. Observed: two style skills each claiming
+a page that had an identity of its own, neither saying what to do when the surface already had a
+style, and a diagram template linking a web font into a self-contained document.
+
+⚠ **Width is `overflow-x`, never a cut.** A table that does not fit scrolls; a generator that
+shortens cell text to make it fit has paraphrased the source, and the count-based checks in rule 7
+cannot see it (`analytical-document-build` §7).
+
 > **The general form, and it belongs wherever skills are authored: a skill should mark each rule
 > as a requirement or a permission.** The two behave completely differently once a second skill is
 > loaded. **Most rules in most style skills are permissions written in the grammar of

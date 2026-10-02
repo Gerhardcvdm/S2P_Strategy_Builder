@@ -100,7 +100,7 @@ tablerows() { # $1 file -> ROWS = body rows of the first markdown table (pipe li
   local n=0 l; while IFS= read -r l; do [[ "$l" == "|"* ]] && [[ "$l" != "|-"* ]] && [[ "$l" != "| -"* ]] && n=$((n+1)); done < "$1"
   ROWS=$(( n > 0 ? n - 1 : 0 )); }
 timings="no RUN-TIMINGS.md"; [ -f RUN-TIMINGS.md ] && { tablerows RUN-TIMINGS.md; timings="RUN-TIMINGS.md · $ROWS rows"; }
-reg=""; for f in ruling*.md RULINGS.md rulings*.md strategy/ruling*.md strategy/RULINGS.md portfolio/ruling*.md; do [ -f "$f" ] && { reg="$f"; break; }; done
+reg=""; for f in ruling*.md RULINGS.md rulings*.md strategy/ruling*.md strategy/RULINGS.md portfolio/ruling*.md recommendation/ruling*.md; do [ -f "$f" ] && { reg="$f"; break; }; done
 register="no ruling register found"; [ -n "$reg" ] && { tablerows "$reg"; e "$reg"; register="$E · $ROWS rows"; }
 
 # grepcount FILE REGEX -> GC = number of matching lines, no subprocess
@@ -108,14 +108,15 @@ grepcount() { GC=0; local l; [ -f "$1" ] || return 0; while IFS= read -r l; do [
 
 # ---- the first lines of every reviewer pass, read once, so a pass can be found by the artefact it names ----
 declare -A CHEAD=()
-for cf in strategy/critic/*.md portfolio/critic/*.md deliverables/critic/*.md critic/*.md; do
+for cf in strategy/critic/*.md portfolio/critic/*.md recommendation/critic/*.md deliverables/critic/*.md critic/*.md; do
   [[ "$cf" == */README.md ]] && continue
   n=0; s=""; while IFS= read -r l && [ $n -lt 2 ]; do s="$s$l"$'\n'; n=$((n+1)); done < "$cf"; CHEAD[$cf]="$s"
 done
 
 # ---- read the map into arrays -----------------------------------------------------------------
-declare -A arcname=([D1]="D#1 · /build-strategy" [D2]="D#2 · /build-portfolio" [D3]="D#3 · /build-recommendation")
-declare -a M_arc=() M_id=() M_kind=() M_label=() M_targets=() M_exclude=() M_skipif=() M_critic=() M_note=() M_since=() M_waits=()
+declare -A arcname=([D1]="D#1 · /build-strategy" [D2]="D#2 · /build-portfolio" [D3]="D#3 · /build-recommendation" [S]="Storyline · /review-storyline")
+declare -a M_arc=() M_id=() M_kind=() M_label=() M_targets=() M_exclude=() M_skipif=() M_critic=() M_note=() M_since=() M_waits=() M_storyline=()
+map_wide=""   # rows with more columns than the reader knows: reported, never folded into the last field unseen
 while IFS= read -r line; do
   [ -z "$line" ] && continue
   if [[ "$line" == "#="* ]]; then  # a directive: "#= Key: value"
@@ -128,9 +129,11 @@ while IFS= read -r line; do
   fi
   [[ "$line" == \#* ]] && continue
   # tabs are IFS whitespace, so a run of them would collapse and shift every field after an empty one
-  line="${line//$'\t'/$'\x1f'}"; IFS=$'\x1f' read -r arc id kind label targets exclude skipif critic note since waits <<< "$line"
+  # the LAST variable takes the rest of the line, so a column this reader does not know would land inside waits; rest catches it
+  line="${line//$'\t'/$'\x1f'}"; IFS=$'\x1f' read -r arc id kind label targets exclude skipif critic note since waits storyline rest <<< "$line"
+  [ -n "${rest:-}" ] && map_wide="$map_wide $arc:$id"
   M_arc+=("$arc"); M_id+=("$id"); M_kind+=("$kind"); M_label+=("$label"); M_targets+=("$targets")
-  M_exclude+=("$exclude"); M_skipif+=("$skipif"); M_critic+=("$critic"); M_note+=("$note"); M_since+=("${since:--}"); M_waits+=("${waits:--}")
+  M_exclude+=("$exclude"); M_skipif+=("$skipif"); M_critic+=("$critic"); M_note+=("$note"); M_since+=("${since:--}"); M_waits+=("${waits:--}"); M_storyline+=("${storyline:-}")
 done < "$map"
 N=${#M_arc[@]}
 
@@ -171,6 +174,7 @@ done
 # ---- walk each arc ------------------------------------------------------------------------------
 anom=""; n_anom=0
 anomaly() { anom="$anom<li>$1</li>"; n_anom=$((n_anom+1)); }
+[ -n "$map_wide" ] && anomaly "Map rows with more columns than this reader knows (<code>${map_wide# }</code>). The extra field was ignored here; a reader that folded it into <i>waits</i> would drop the cross-arc dependency without a signal."
 declare -a arcs=()
 declare -A arc_pos=() arc_done=() arc_total=() arc_gates=() arc_gpass=() arc_ch=() arc_cn=() arc_state=() arc_first=() arc_last=() arc_gaps=() arc_pct=() arc_waits=()
 for ((i=0;i<N;i++)); do
@@ -300,7 +304,7 @@ done
 
 # ---- the unmapped-files sweep ---------------------------------------------------------------
 unmapped=""
-for f in strategy/* client/* portfolio/* portfolio/demo/* demo/* deliverables/*; do
+for f in strategy/* client/* portfolio/* portfolio/demo/* demo/* recommendation/* recommendation/tools/* deliverables/* storyline/*; do
   [ -f "$f" ] || continue; [[ "$f" == */README.md ]] && continue
   [ -n "${matched[$f]:-}" ] || { e "$f"; unmapped="$unmapped<li><code>$E</code></li>"; }
 done
@@ -442,7 +446,7 @@ a{color:var(--link);text-decoration:underline}table{break-inside:auto}tr{break-i
     <h1>${position}</h1>
     <p>${org:-not named} · ${fn:-no function stated} · sponsor ${sponsor:-not named} · ${mode:-mode not stated}</p>
   </div>
-  <div class="hero-pct" title="Stages with artefacts plus gates ruled or passed, over all stages and gates of the three arcs. It counts what exists, not whether it is right.">
+  <div class="hero-pct" title="Stages with artefacts plus gates ruled or passed, over all stages and gates of every arc on the map. It counts what exists, not whether it is right.">
     <div class="v">≈ ${pct}%</div>
     <div class="l">of the run, approximate</div>
     <div class="bar"><i style="width:${pct}%"></i></div>
@@ -456,7 +460,7 @@ a{color:var(--link);text-decoration:underline}table{break-inside:auto}tr{break-i
   <div class="stat${warn_dirty}"><div class="value">${dirty}</div><div class="label">uncommitted changes</div></div>
   <div class="stat${warn_anom}"><div class="value">${n_anom}</div><div class="label">things to look at</div></div>
 </div>
-<p class="legend">The percentage is stages with an artefact plus gates with a ruling record or a stage after them, over every stage and gate of the three arcs. It counts what exists and says nothing about whether it is right. A gate reads ruled when a ruling row was found, passed when the run merely went on, and n/a when this run did not need it. A stage reads not on file when it has no artefact but later stages do.</p>
+<p class="legend">The percentage is stages with an artefact plus gates with a ruling record or a stage after them, over every stage and gate of every arc on the map. It counts what exists and says nothing about whether it is right. A gate reads ruled when a ruling row was found, passed when the run merely went on, and n/a when this run did not need it. A stage reads not on file when it has no artefact but later stages do.</p>
 ${arcs_html}
 
 <section class="card anom">

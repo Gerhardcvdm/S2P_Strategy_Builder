@@ -48,7 +48,10 @@ What changes is how much of each file you open to run it.**
   gives you without the prose. Never check `absorbed + excluded = total` against only the cited
   entries: the uncited ones are exactly what the check exists to find.
 - **State what you read in the report header**, each file with *full* or *lookup* and its line
-  count, so the command can see what the pass cost and what it could not have seen.
+  count, so the command can see what the pass cost and what it could not have seen — **and the
+  model you ran on.** You inherit the session's model unless one was set for you, and an inherited
+  setting is a variable nobody wrote down; the finding band this method is judged against is only
+  interpretable if every pass records it.
 - If a check needs something outside this table, name the file and the check under
   *Untestable by me* rather than reading it. The command decides whether a wider pass is worth it.
 
@@ -108,6 +111,45 @@ checks. Each of those is now a lookup row.
 - **No orphans**, and no items citing something that does not exist.
 - **A claim promoted to a heading or a summary must carry the same hedging as its source.** A
   hedged estimate that becomes a confident finding when it changes register is a defect.
+- **Every quoted cell is diffed against its source in full** — not by prefix, not by count. A
+  fixed-length cut with an ellipsis is a paraphrase, and the qualifications live in the tail.
+
+**Quoted fields and identifiers**
+
+- ⭐ **Byte-compare every copy of a field the run calls verbatim** — the proposition, the mandate,
+  a ruled replacement — across every file that quotes it. On one run three copies written within
+  fifteen minutes were three different strings, each labelled verbatim; this check found in one
+  pass what three careful writes missed. Report each variant with its file and line.
+- **Grep every artefact for identifiers, counts and claim-phrases a later artefact records as
+  struck, superseded or withdrawn** (`~~struck~~`, *— withdrawn*, *read N until <date>*), and
+  report each surviving instance. Nothing else looks backward.
+- **Any series the stage introduces — a prefix followed by a digit, a one-to-three-letter column
+  name — is checked against the identifier registry**, and a series that is not registered or
+  collides with one already in play is a finding. A hyphenated series is still a series.
+
+**Gates**
+
+- **Every item the gate reserves for the person is decidable by a reader who has not opened the
+  artefacts.** An item put as a table of identifiers and record fields has not been put; name it.
+- **Every gate row carries exactly one recommended answer or is marked as requiring a choice.**
+  A row offering two cannot be batch-authorised, and the register would not show that it was.
+- **No carried item carries a mark the artefact wrote itself.** *Accepted* beside an agenda item
+  is the ruler's to write; an artefact that printed it has taken the ruling.
+
+**Verification stages — where the artefact is a verifier**
+
+- ⛔ **Reading a verifier against its page finds whether the script runs; it cannot find what the
+  script lets through.** So on a stage whose artefact certifies another artefact, **build a mutation
+  set from the page's own claims and run the verifier against each on a copy**: drop an annexe row,
+  un-strike a withdrawn clause, swap two citations, change a count by one, add a second version
+  string, remove a source attribute, drop a register row the page should mirror. **Every mutation
+  the verifier passes is a finding.** On the run this check comes from, seven of a pass's ten
+  findings came from such a harness, built unasked; the verifier had reported `ALL CHECKS PASS`
+  over a dropped ruling, an un-struck clause and five untested counts.
+- **Every completeness check names two denominators**, one of them a register the author did not
+  write for this page; an expected value typed into the script as a literal is the drafting
+  computation run twice, and is a finding.
+- **Separate *met on the record* from *met by the verifier's word*** when walking a stop condition.
 
 # The craft checks — judgement, quote the line
 
@@ -144,6 +186,8 @@ checks. Each of those is now a lookup row.
 ## Critic — step N · [artefact]
 
 **Read:** [each file, marked full or lookup, with its line count — this is what the pass cost]
+**Model:** [the model this pass ran on — inherited from the session unless set]
+**Plugin:** [the plugin version the stage ran under, from the artefact's header]
 **Ran:** [the checks executed]
 **Clean:** [checks that passed, named]
 

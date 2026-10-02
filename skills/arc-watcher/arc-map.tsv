@@ -1,7 +1,9 @@
 # arc-map.tsv — the artefact map the watcher renders from. Tab-separated. Row order is run order.
-# arc	id	kind	label	targets	exclude	skipif	critic	note	since	waits
+# arc	id	kind	label	targets	exclude	skipif	critic	note	since	waits	storyline
 # kind: stage | gate | check.
 # targets: items separated by |. Each item is a glob, or file::regex (a grep test), or - for none.
+#   What a target IS depends on kind: stage — an artefact the stage leaves; gate — the ruling record; check — an input the
+#   guard reads (intake.md), never an artefact. A reader attributing files to stages skips check rows.
 #   A glob prefixed ? is CLAIMED but not REQUIRED: it stops the unmapped sweep naming the file, and does not make the stage done.
 #   On a gate row, a file::regex target is the ruling record: when it matches, the gate is RULED rather than inferred.
 # exclude: regex applied to matched paths, or -.  skipif: file::pattern — when it matches, the stage counts as skipped by design.
@@ -9,54 +11,62 @@
 #   several patterns separated by |, tried in order; n/a for a stage no critic reviews (a proxy pass); - when the command does not say.
 # since: the plugin version the row entered the method. A stage missing while later stages are done is reported once, with this.
 # waits: what this row cannot start before, outside its own arc — ARC:ID. Inside an arc the order is the dependency.
+# storyline: the storyline stage this row begins (strategy, portfolio, prioritisation, choice, specification). Blank = the row sits
+#   inside the stage of the row before it; - = belongs to no storyline stage. Read by storyline-review, not by the renderer.
 # ⛔ A stage that adds an artefact adds a row here AND a line to the command's resume map AND a directory to its scan. Same edit.
-D1	0	check	intake read · guards	intake.md	-	-	-	leaves no artefact by design	0.1.0	-
-D1	G0	gate	Gate 0 · the proposition and the unit	strategy/rulings.md::\*\*R0-|handoff.md::[Gg][Aa][Tt][Ee] 0 .*taken	-	-	-	ruled as the approved plan; first write is the ruling register	0.2.0	-
-D1	1	stage	frame	strategy/frame.md	-	-	strategy/critic/*.md::{file}|strategy/critic/{id}.md		0.1.0	-
-D1	1p	stage	early proxy	strategy/frame-agenda.md	-	-	n/a	stakeholder-proxy on the frame; not a critic'd stage	0.2.0	-
-D1	G1	gate	Gate 1 · mandate recognised	strategy/rulings.md::\*\*R1-	-	-	-		0.1.0	-
-D1	2	stage	research · record grade	client/*	-	-	strategy/critic/{id}.md|strategy/critic/*.md::{file}	public record only	0.1.0	-
-D1	G2	gate	Gate 2 · entity · sources · grade	strategy/rulings.md::\*\*R2-	-	-	-		0.1.0	-
-D1	3	stage	function · activity · pain maps	strategy/*-function-map.md|strategy/*-activity-map.md|strategy/*-pain-map.md	-	-	strategy/critic/{id}.md|strategy/critic/*.md::{file}		0.1.0	-
-D1	G3	gate	Gate 3 · looks like the function	strategy/rulings.md::\*\*R3-	-	-	-		0.1.0	-
-D1	G4	gate	Gate 4 · sponsor ruling	strategy/rulings.md::\*\*R4-	-	-	-	before stage 4	0.1.0	-
-D1	4	stage	value drivers	strategy/*-value-drivers.md	-	-	strategy/critic/*.md::{file}|strategy/critic/{id}.md		0.1.0	-
-D1	5	stage	applicability framework	strategy/ai-applicability-framework.md	-	-	strategy/critic/*.md::{file}|strategy/critic/{id}.md		0.1.0	-
-D1	6	stage	opportunity map	strategy/*-opportunity-map.md	-	-	strategy/critic/*.md::{file}|strategy/critic/{id}.md		0.1.0	-
-D1	7	stage	audit	strategy/step5-audit.md|strategy/*-audit.md	-	-	strategy/critic/*.md::{file}|strategy/critic/{id}.md		0.1.0	-
-D1	G5	gate	Gate 5 · audit findings	strategy/rulings.md::\*\*R5-|handoff.md::[Gg][Aa][Tt][Ee] 5 — .*taken	-	-	-		0.1.0	-
-D1	7a	stage	sizing	strategy/*-sizing.md	-	-	strategy/critic/*.md::{file}|strategy/critic/{id}.md		0.1.0	-
-D1	G5a	gate	Gate 5a · figure bases	strategy/rulings.md::\*\*R5a-|handoff.md::[Gg][Aa][Tt][Ee] 5a — .*taken	-	-	-		0.1.0	-
-D1	8	stage	strategy basis	strategy/*strategy-basis.md	-	-	strategy/critic/*.md::{file}|strategy/critic/{id}.md		0.1.0	-
-D1	8p	stage	late proxy	strategy/sponsor-agenda.md	-	-	n/a	stakeholder-proxy on the basis; not a critic'd stage	0.1.0	-
-D1	G6	gate	Gate 6 · assumption · correction	strategy/rulings.md::\*\*R6-|handoff.md::[Gg][Aa][Tt][Ee] 6 — .*taken	-	-	-		0.1.0	-
-D1	9	stage	approach review	strategy/approach-review.md	-	-	strategy/critic/*.md::{file}|strategy/critic/{id}.md		0.1.0	-
-D1	G7	gate	Gate 7 · review recommendations	strategy/rulings.md::\*\*R7-|handoff.md::[Gg][Aa][Tt][Ee] 7 — .*taken	-	-	-		0.1.0	-
-D1	G8	gate	Gate 8 · contract rulings	strategy/rulings.md::\*\*R8-|handoff.md::[Gg][Aa][Tt][Ee] 8 — .*taken	-	-	-	before stage 10	0.1.0	-
-D1	10	stage	SPEC	deliverables/SPEC.md	-	-	strategy/critic/*.md::{file}|strategy/critic/{id}.md		0.1.0	-
-D1	11	stage	D#1 · the strategy paper	deliverables/*.html	portfolio|recommendation|RUN-PROGRESS	-	strategy/critic/*.md::{file}|strategy/critic/{id}.md		0.1.0	-
-D1	12	stage	verification · worksheet	deliverables/confrontation-worksheet.md|?deliverables/VERIFICATION.md	-	-	n/a	the verification is its own check; no critic pass	0.1.0	-
-D2	0	check	guards on the same intake	intake.md	-	-	-	no intake of its own	0.1.0	D1:11
-D2	0a	stage	entry path	portfolio/entry.md	-	-	portfolio/critic/{id}.md	adopted or traversed	0.2.0	-
-D2	GP1	gate	Gate P1 · partial strategy	portfolio/rulings.md::\*\*P1-R	-	portfolio/entry.md::adopted	-	only when the strategy is partial	0.2.0	-
-D2	1	stage	traverse	portfolio/layer*.md|portfolio/*-layer-*.md	-	portfolio/entry.md::adopted	portfolio/critic/{id}.md	skipped when adopted	0.1.0	-
-D2	2	stage	assemble	portfolio/use-cases.md|portfolio/filter-log.md	-	-	portfolio/critic/{id}.md		0.1.0	-
-D2	GP2	gate	Gate P2 · filter log	portfolio/rulings.md::\*\*P2-R	-	-	-		0.1.0	-
-D2	3	stage	score	portfolio/positioning-matrix.md|portfolio/portfolio.md	-	-	portfolio/critic/{id}.md		0.1.0	-
-D2	GP3	gate	Gate P3 · the weighting	portfolio/rulings.md::\*\*P3-R	-	-	-		0.1.0	-
-D2	4	stage	rank	portfolio/portfolio-ranking.md	-	-	portfolio/critic/{id}.md		0.1.0	-
-D2	5	stage	orders	portfolio/orders.md	-	-	portfolio/critic/{id}.md		0.1.0	-
-D2	6	stage	attack	portfolio/challenge-round.md	-	-	portfolio/critic/{id}.md		0.1.0	-
-D2	GP4	gate	Gate P4 · attack findings	portfolio/rulings.md::\*\*P4-R	-	-	-		0.1.0	-
-D2	GP5	gate	Gate P5 · first proof · criteria	portfolio/rulings.md::\*\*P5-R	-	-	-	before stage 7	0.1.0	-
-D2	7	stage	select	portfolio/demo/prototype-choice.md|demo/prototype-choice.md|?portfolio/selection-criteria.md	-	-	portfolio/critic/{id}.md	two paths in use across the commands	0.1.0	-
-D2	8	stage	D#2 · the portfolio	deliverables/agentic-use-case-portfolio.html	-	-	portfolio/critic/{id}.md		0.1.0	-
-D2	9	stage	stop check	portfolio/stop-check.md	-	-	portfolio/critic/{id}.md		0.1.0	-
-D3	0	check	guards · inputs	intake.md	-	-	-		0.1.0	D2:7
-D3	GR1	gate	Gate R1 · the contract	portfolio/rulings.md::\*\*R1-R	-	-	-	ruled as the approved plan; first write is SPEC Part III	0.1.0	-
-D3	1	stage	SPEC Part III	deliverables/SPEC.md::Part III	-	-	-		0.1.0	-
-D3	2	stage	outline	**/recommendation-outline.md	-	-	-		0.1.0	-
-D3	3	stage	proxy pass	strategy/recommendation-agenda.md	-	-	n/a	stakeholder-proxy on D#2 and the first proof; its own file, so D#1's late proxy is not overwritten	0.4.1	-
-D3	GR2	gate	Gate R2 · the agenda	portfolio/rulings.md::\*\*R2-R	-	-	-		0.1.0	-
-D3	4	stage	D#3 · the recommendation	deliverables/*-build-recommendation.html	-	-	-		0.1.0	-
-D3	5	stage	verify · worksheet	deliverables/recommendation-confrontation-worksheet.md	-	-	-		0.1.0	-
+D1	0	check	intake read · guards	intake.md	-	-	-	leaves no artefact by design	0.1.0	-	strategy
+D1	G0	gate	Gate 0 · the proposition and the unit	strategy/rulings.md::\*\*R0-|handoff.md::[Gg][Aa][Tt][Ee] 0 .*taken	-	-	-	ruled as the approved plan; first write is the ruling register	0.2.0	-	
+D1	1	stage	frame	strategy/frame.md	-	-	strategy/critic/*.md::{file}|strategy/critic/{id}.md		0.1.0	-	
+D1	1p	stage	early proxy	strategy/frame-agenda.md	-	-	n/a	stakeholder-proxy on the frame; not a critic'd stage	0.2.0	-	
+D1	G1	gate	Gate 1 · mandate recognised	strategy/rulings.md::\*\*R1-	-	-	-		0.1.0	-	
+D1	2	stage	research · record grade	client/*	-	-	strategy/critic/{id}.md|strategy/critic/*.md::{file}	public record only	0.1.0	-	
+D1	G2	gate	Gate 2 · entity · sources · grade	strategy/rulings.md::\*\*R2-	-	-	-		0.1.0	-	
+D1	3	stage	function · activity · pain maps	strategy/*-function-map.md|strategy/*-activity-map.md|strategy/*-pain-map.md	-	-	strategy/critic/{id}.md|strategy/critic/*.md::{file}		0.1.0	-	
+D1	G3	gate	Gate 3 · looks like the function	strategy/rulings.md::\*\*R3-	-	-	-		0.1.0	-	
+D1	G4	gate	Gate 4 · sponsor ruling	strategy/rulings.md::\*\*R4-	-	-	-	before stage 4	0.1.0	-	
+D1	4	stage	value drivers	strategy/*-value-drivers.md	-	-	strategy/critic/*.md::{file}|strategy/critic/{id}.md		0.1.0	-	
+D1	5	stage	applicability framework	strategy/ai-applicability-framework.md	-	-	strategy/critic/*.md::{file}|strategy/critic/{id}.md		0.1.0	-	
+D1	6	stage	opportunity map	strategy/*-opportunity-map.md	-	-	strategy/critic/*.md::{file}|strategy/critic/{id}.md		0.1.0	-	
+D1	7	stage	audit	strategy/step5-audit.md|strategy/*-audit.md	-	-	strategy/critic/*.md::{file}|strategy/critic/{id}.md		0.1.0	-	
+D1	G5	gate	Gate 5 · audit findings	strategy/rulings.md::\*\*R5-|handoff.md::[Gg][Aa][Tt][Ee] 5 — .*taken	-	-	-		0.1.0	-	
+D1	7a	stage	sizing	strategy/*-sizing.md	-	-	strategy/critic/*.md::{file}|strategy/critic/{id}.md		0.1.0	-	
+D1	G5a	gate	Gate 5a · figure bases	strategy/rulings.md::\*\*R5a-|handoff.md::[Gg][Aa][Tt][Ee] 5a — .*taken	-	-	-		0.1.0	-	
+D1	8	stage	strategy basis	strategy/*strategy-basis.md	-	-	strategy/critic/*.md::{file}|strategy/critic/{id}.md		0.1.0	-	
+D1	8p	stage	late proxy	strategy/sponsor-agenda.md	-	-	n/a	stakeholder-proxy on the basis; not a critic'd stage	0.1.0	-	
+D1	G6	gate	Gate 6 · assumption · correction	strategy/rulings.md::\*\*R6-|handoff.md::[Gg][Aa][Tt][Ee] 6 — .*taken	-	-	-		0.1.0	-	
+D1	9	stage	approach review	strategy/approach-review.md	-	-	strategy/critic/*.md::{file}|strategy/critic/{id}.md		0.1.0	-	
+D1	G7	gate	Gate 7 · review recommendations	strategy/rulings.md::\*\*R7-|handoff.md::[Gg][Aa][Tt][Ee] 7 — .*taken	-	-	-		0.1.0	-	
+D1	G8	gate	Gate 8 · contract rulings	strategy/rulings.md::\*\*R8-|handoff.md::[Gg][Aa][Tt][Ee] 8 — .*taken	-	-	-	before stage 10	0.1.0	-	
+D1	10	stage	SPEC	deliverables/SPEC.md	-	-	strategy/critic/*.md::{file}|strategy/critic/{id}.md		0.1.0	-	
+D1	11	stage	D#1 · the strategy paper	deliverables/*.html	portfolio|recommendation|RUN-PROGRESS	-	strategy/critic/*.md::{file}|strategy/critic/{id}.md		0.1.0	-	
+D1	12	stage	verification · worksheet	deliverables/confrontation-worksheet.md|?deliverables/VERIFICATION.md	-	-	n/a	the verification is its own check; no critic pass	0.1.0	-	
+D2	0	check	guards on the same intake	intake.md	-	-	-	no intake of its own	0.1.0	D1:11	portfolio
+D2	0a	stage	entry path	portfolio/entry.md|?portfolio/rulings.md	-	-	portfolio/critic/{id}.md	adopted or traversed; creates the register	0.2.0	-	
+D2	GP1	gate	Gate GP1 · partial strategy	portfolio/rulings.md::\*\*G?P1-R	-	portfolio/entry.md::adopted	-	only when the strategy is partial; P1-R before 0.6.0	0.2.0	-	
+D2	1	stage	traverse	portfolio/layer*.md|portfolio/*-layer-*.md	-	portfolio/entry.md::adopted	portfolio/critic/{id}.md	skipped when adopted	0.1.0	-	
+D2	2	stage	assemble	portfolio/use-cases.md|portfolio/filter-log.md	-	-	portfolio/critic/{id}.md		0.1.0	-	
+D2	GP2	gate	Gate GP2 · filter log	portfolio/rulings.md::\*\*G?P2-R	-	-	-		0.1.0	-	
+D2	3	stage	score	portfolio/positioning-matrix.md|portfolio/portfolio.md	-	-	portfolio/critic/{id}.md		0.1.0	-	
+D2	GP3	gate	Gate GP3 · the weighting	portfolio/rulings.md::\*\*G?P3-R	-	-	-		0.1.0	-	
+D2	4	stage	rank	portfolio/portfolio-ranking.md	-	-	portfolio/critic/{id}.md		0.1.0	-	prioritisation
+D2	5	stage	orders	portfolio/orders.md	-	-	portfolio/critic/{id}.md		0.1.0	-	
+D2	6	stage	attack	portfolio/challenge-round.md	-	-	portfolio/critic/{id}.md		0.1.0	-	
+D2	GP4	gate	Gate GP4 · attack findings	portfolio/rulings.md::\*\*G?P4-R	-	-	-		0.1.0	-	
+D2	GP5	gate	Gate GP5 · first proof · criteria	portfolio/rulings.md::\*\*G?P5-R	-	-	-	before stage 7	0.1.0	-	
+D2	7	stage	select	portfolio/demo/prototype-choice.md|demo/prototype-choice.md|?portfolio/selection-criteria.md|?portfolio/gate-*-briefing.md	-	-	portfolio/critic/{id}.md	portfolio/demo/ since 0.6.0; demo/ on earlier runs	0.1.0	-	choice
+D2	8	stage	stop check	portfolio/stop-check.md	-	-	portfolio/critic/*.md::{file}|portfolio/critic/{id}.md|portfolio/critic/9.md	stage 9 before 0.6.0; found by file name either way	0.1.0	-	
+D2	8s	stage	SPEC Part II	deliverables/SPEC-D2.md	-	-	portfolio/critic/{id}.md	the specification, reviewed before the build	0.6.0	-	portfolio
+D2	9	stage	D#2 · the portfolio	deliverables/agentic-use-case-portfolio.html	-	-	portfolio/critic/*.md::{file}|portfolio/critic/{id}.md|portfolio/critic/8.md	stage 8 before 0.6.0	0.1.0	-	
+D3	0	check	guards · inputs	intake.md|?recommendation/rulings.md|?recommendation/tools/*	-	-	-	creates recommendation/ and its register	0.1.0	D2:7	specification
+D3	GR1	gate	Gate GR1 · the contract	recommendation/rulings.md::\*\*GR1-R|portfolio/rulings.md::\*\*G?R1-R	-	-	-	ruled as the approved plan; first write is the register, then SPEC Part III. R1-R in portfolio/rulings.md before 0.6.0	0.1.0	-	
+D3	1	stage	SPEC Part III	deliverables/SPEC.md::Part III	-	-	recommendation/critic/{id}.md		0.1.0	-	
+D3	2	stage	outline	**/recommendation-outline.md	-	-	recommendation/critic/{id}.md		0.1.0	-	
+D3	3	stage	proxy pass	recommendation/recommendation-agenda.md|strategy/recommendation-agenda.md	-	-	n/a	stakeholder-proxy writes it; under strategy/ before 0.6.0	0.4.1	-	
+D3	GR2	gate	Gate GR2 · the agenda	recommendation/rulings.md::\*\*GR2-R|portfolio/rulings.md::\*\*G?R2-R	-	-	-		0.1.0	-	
+D3	4	stage	D#3 · the recommendation	deliverables/*-build-recommendation.html	-	-	recommendation/critic/{id}.md		0.1.0	-	
+D3	5	stage	verify · worksheet	deliverables/recommendation-confrontation-worksheet.md	-	-	recommendation/critic/{id}.md		0.1.0	-	
+S	0	check	guards · map has the stage column · two stages on file	intake.md	-	-	-	leaves no artefact by design	0.7.0	D2:0a	-
+S	1	stage	the draft record	storyline/storyline-review.md|?storyline/rulings.md|?storyline/calendar.tsv	-	-	n/a	storyline-reviewer drafts it after the command writes the stub; no critic pass	0.7.0	-	-
+S	GS1	gate	Gate GS1 · the confront	storyline/rulings.md::\*\*GS1-R	-	-	-	one call per handoff; the zero-changed question when it applies	0.7.0	-	-
+S	GS2	gate	Gate GS2 · the weakest link	storyline/rulings.md::\*\*GS2-R	-	-	-	the link and its smallest repair, named not made	0.7.0	-	-
+S	5	stage	the page	storyline/storyline-review.html	-	-	n/a	derived by build_storyline.py; refuses rather than fakes	0.7.0	-	-

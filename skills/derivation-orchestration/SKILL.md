@@ -75,6 +75,15 @@ frame, rather than discovering the conflict mid-run.
 proceeds, and produces work that looks reviewed.** A check that cannot find its input does not
 fail — it passes.
 
+⚠ **A guard that shells out to a named tool asserts the tool exists before trusting the reading.**
+A missing binary does not fail the check; it produces empty output that every downstream comparison
+treats as agreement, and the idiom `<check> && echo PASSED` then prints a verdict the author wrote
+rather than one the check computed. Observed: a settings diff run through a JSON tool that was not
+installed compared nothing against nothing and printed a clean bill. Open every such step with
+`command -v <tool> >/dev/null || { echo "VERIFICATION NOT RUN: <tool> missing"; exit 1; }`, prefer a
+validator that ships with the runtime already in use, and have the check print a verdict from data
+it computed.
+
 ⚠ **Error handling describes the response, never the detection.** A condition named only in a
 command's error-handling section is a wish: that section is read after something has already gone
 wrong, so it cannot enforce a check that must run on the success path. Observed: an error-handling
@@ -145,6 +154,14 @@ are where the two diverge and nothing else in the method is affected.
 | A gate asking *"would the sponsor recognise this?"* | is answerable | ⛔ **is not** — it becomes *"is this defensible enough to put in front of them cold?"* |
 | An unanswerable question | goes to the sponsor | becomes a **registered assumption plus an agenda item**, ranked by cost of being wrong |
 
+⛔ **A field the agent may not supply, supplied by the agent under a ruling, is re-put to the person
+in plain words at the very next gate — before anything quotes it.** Recording the deviation is not
+arresting it. Observed: an agent-drafted proposition accepted with *go with the defaults* was
+quoted verbatim through twenty-one stages and thirteen gates, owned the deliverable's first screen
+and filtered half the portfolio; every check recorded the exposure and none could stop the run,
+because only a gate can refuse, and the first gate to put the sentence in plain words was the second
+arc's fifth. The frame's deviation entry stays; the next gate is the step that acts on it.
+
 **The rulings are the same rulings; only the source of the answer changes.** ⛔ **An
 unanswerable gate is bypassed rather than removed** — it stalls the run once, is talked past the
 second time, and thereafter trains the operator to treat every guard as an obstacle. Phrase each
@@ -161,6 +178,17 @@ gate's report *is* the plan, and approval is the event after which the first wri
 resumed run the resume report is the plan — the artefacts found, the stage each maps to, the gate a
 resume onto that point must stop at — because a wrong resume point re-runs finished work or skips
 a gate and this is the one cheap moment to catch it.
+
+⛔ **The trigger is the context boundary, not the word *resume*.** Plan mode on a resume exists to
+catch a lost context. When the stage being resumed follows a gate ruled *in the current session*,
+nothing has been lost: the register holds the rulings and the inputs are in context. Observed: a
+resume immediately after a same-session gate re-put, as a plan, the content the person had ruled
+minutes earlier; they approved what they had just decided, and the stage's produce span carried a
+round trip that produced no information. Fired on the name of the step, the checkpoint teaches the
+operator that it is a formality — which is what makes them wave through the one that matters. So:
+**a resume across a clear, a compaction or a new session enters plan mode; a resume that follows a
+gate ruled this session writes a one-line statement in the gate close-out — *stage N starts;
+inputs: …* — and proceeds.**
 
 ⛔ **It ends before the first stage and is not re-entered at mid-arc gates.** Those gates rule on an
 artefact already written and reviewed; a read-only mode there blocks the reviewer's file and the
@@ -194,9 +222,38 @@ Three obligations follow, each violated in practice:
    step is therefore a change to the **state model**, not just to the sequence.
 2. **Anything inserted between two numbered stages needs its own sort key** (`8p` between 8 and
    9). A resume rule that points at stages cannot see a step that is not one.
-3. ⚠ **A gate that does not sit *after* a stage is skipped by every resume**, because the resume
-   points at a stage and a gate is not one. List those gates, and make a resume landing on one
-   stop there before producing anything.
+3. ⛔ **No gate is visible to an artefact scan — not only the ones that do not sit after a
+   stage.** A stage that has been produced, reviewed and rebuilt looks exactly like one that has
+   also been ruled: same artefact, same reviewer file, same commit shape. Approval leaves no trace
+   on the thing approved. An earlier version of this rule named only the gates that precede a
+   stage, and a run paused at an ordinary post-stage gate with seven rulings open would have been
+   resumed past it, correctly by the scan's logic and wrongly in fact. **The register is what makes
+   a gate visible** (below): the resume is a join — for each completed stage, is a gate defined
+   after it, and does the register carry that gate's rulings? **A completed stage with a gate
+   after it and no rulings on file is a stop, not a question** — the resume lands on the gate and
+   produces nothing until it is ruled. Gates that precede a stage are still listed, because they
+   are the ones a resume onto that stage would otherwise land past.
+
+### Three artefacts every command creates at entry, before stage 1
+
+⛔ **A rule that checks one artefact against another is only as real as the second artefact's
+existence, and stating what it should contain does not make anything create it.** Three files in
+this discipline are referees for other rules, and on the run that produced this section none of
+them was created by any step: the rules that depended on them were unrunnable, and a hand-maintained
+resume document filled the gap — which is the tell, below, that the mechanism has already broken.
+So the entry step of every command writes all three, empty, as its first writes after the entry
+ruling, and the pre-flight asserts them:
+
+| File | Referee for | Created |
+|---|---|---|
+| **The ruling register** — one row per ruling: identifier, question, answer, mode, who, date | §3 rules 2, 3 and 5; the resume join above | At the entry gate, holding that gate's rulings as its first rows |
+| **The identifier registry** — every series in play, its prefix, its range and its owner | The collision rule below; §7 | At entry, seeded with the series the command mints and every series its inputs already carry |
+| **The timings file** — one row per stage-phase, from commit timestamps or `not measured` | §8's close-out; §9 | At entry, header only |
+
+The gate's accounting line (§3 rule 1) is **computed from the register**, never narrated; the
+collision check is a grep against the registry, never a recollection; the timings row is a
+condition of the commit. **Every stage header also records the plugin version it ran under** — see
+the resume rule below.
 
 **A stage that adds an artefact adds a line to the resume map, a directory to the scan, one to
 any count stated in prose, and a row to any rendered view of the map** — all of them, in the same
@@ -213,17 +270,45 @@ to have no pass at all.
 
 - **Require the pass filename to carry the orchestrator's own stage identifier**, since the
   orchestrator is what reads it — and say so in the same sentence that defines the write, not in
-  a separate convention elsewhere.
+  a separate convention elsewhere. ⛔ **Where more than one orchestrator writes into the same
+  repository, the pass carries the orchestrator's identity as well as its stage** — a directory
+  per arc, named in the command. Three commands running in sequence in one repo each have a
+  stage 2, 3, 4 and 5; a shared reviewer directory overwrites the first arc's passes silently, and
+  the author who notices invents a directory the next engagement will invent differently. **Every
+  arc has a directory of its own before its first artefact**, and the view that reports on the run
+  reads from it.
 - **Require the pass's header to record both schemes** (`step 5b · stage 7`), so a human reading
   one file can resolve the other without opening the command.
 - ⛔ **Never mint a new identifier series without checking it against every series already in
   play.** One run had `S1`–`S3` as gate rulings and `S1`–`S32` as sector statements
   simultaneously, in artefacts that quote each other, and an artefact's own verdict read
-  *"conditional on S3"* meaning the other one.
+  *"conditional on S3"* meaning the other one. ⛔ **And a prohibition on minting is not a check on
+  minting.** Identifiers are chosen as a side effect of writing something else — a table header, a
+  gate's criteria list, a generator's constant — and nothing between choosing one and committing
+  asks whether it is a series. On one run the registry existed, was cited, and ended *do not add a
+  series without checking this table*; the same agent minted four colliding series that afternoon.
+  So the check has a moment: **any gate or stage that introduces a series opens the identifier
+  registry first and either takes a free prefix or records the collision at the moment of naming**
+  — never at the moment of recording, because by then the colliding name is in a document a
+  person has ruled on. A hyphenated series is still a series: `R1-R1` is one hyphen from `R1`.
+  **An artefact that continues an existing series reads the series' current maximum from the
+  registry at generation time and asserts its own first identifier is max+1**; a hardcoded
+  continuation is a defect. Observed: a generator drafted in one session against `G1`–`G3`
+  carried `G4`–`G6`; the next session's rebuild registered its own `G4`–`G5`; two different
+  questions would have been `G4` in two committed artefacts. The second extender always believes
+  the range it saw. §8 puts the grep on the commit.
 - **Add a self-test to the resume step:** a stage with an artefact and no reviewer file is
   reported as a **question at the next gate**, not silently re-run. Re-running a pass is not free
   and is not idempotent — a second reading finds different things and they look like new
   information.
+- ⛔ **A resume re-runs the entry guards, and compares the plugin version against the one the
+  entry artefact recorded.** A guard that runs once at entry protects the entry, not the arc.
+  Observed: a plugin updated between two stages of one arc changed what a later stage scored and
+  what the register had to carry, and no artefact said so — the cost model then compared stages
+  measured on two instruments as if on one. On a mismatch, write a version-change note into the
+  next stage's header and the timings file, naming which method sections changed. **Every stage
+  header records the plugin version it ran under**, so the instrument a measurement was taken on
+  can always be named.
 
 > ⭐ **The tell that a stateless resume has already broken is not an error — it is a workaround
 > that keeps succeeding.** If a hand-maintained note is what makes the resume land correctly,
@@ -325,7 +410,14 @@ Five rules, all mechanical:
    defect filed under *"not rulings — stated so they are not mistaken for open"* passed through
    three further gates untouched, and every later artefact described it as *carried*, which reads
    as though a human had accepted it. **Nobody had ever been asked.** If a category like this is
-   kept at all, every item in it must carry an explicit *accepted* or *deferred* mark.
+   kept at all, every item in it is **put for** an *accepted* or *deferred* mark, **and the mark is
+   the ruler's**. ⛔ An earlier wording — *every item must carry a mark* — was satisfied by the
+   artefact writing the mark itself and citing this rule as its authority; rule 3 forbids exactly
+   that, but it is stated about rulings and an *accepted* beside an agenda item does not read as
+   one to the author writing it. A rule phrased as a property the record must have will be
+   satisfied by whoever writes the record. **Until the mark is in the register, the item counts as
+   put in the accounting**, and the accounting is computed from the register, so an artefact
+   cannot mark anything without writing to a file it is not permitted to write.
 5. ⛔ **The register records *how* each ruling was taken, not only what it was.** Three modes:
    *chosen from written options* · *batch authorisation of the agent's recommendation* ·
    *declined*. As rows they look identical — an identifier, a question, an answer — and they carry
@@ -338,10 +430,45 @@ Five rules, all mechanical:
    reversal was not a contradiction but the first real ruling. And present options with costs
    before asking: *take your recommendations* is the answer an unenumerated gate invites.
 
-**This presupposes a ruling register exists.** Require one: a single file, one row per ruling,
-each with an identifier, the question, the answer, **the mode it was taken in**, who ruled and
-the date. Without it, rules 2, 3 and 5 have nothing to check against — and the register is also
-what tells a later session which decisions may not be re-litigated.
+   ⛔ **A recommendation is one answer.** Batch authorisation delegates the choice to the
+   recommendation, so the recommendation has to have made one. A row that offers two — *"M1 only,
+   or none"* — converts the ruler's shortcut into the agent's decision, and the register cannot
+   tell the two apart. Such a row is marked **requires a choice** and is not batch-authorisable;
+   the gate report's accounting counts *N batch-authorisable · N requiring a choice*. ⛔ **And an
+   option is authorised as a rule, not as a description.** A ruler consents to what the option
+   says it does; where the option's stated effect is later found wrong on the records — a promote
+   list that named the wrong entries — record a *description corrected* note against the ruling,
+   re-put only if the rule itself would change, and **generate the effect list from the records
+   wherever the records exist**, because a computed effect cannot be wrong on them. Two further
+   modes follow from this: *batch authorisation on a corrected description* and *requires a
+   choice — not yet taken*.
+
+   ⭐ **What the mode column shows, read across a run: a gate that puts written options with costs
+   gets real rulings; one that does not gets *"take your recommendations"*.** On one run 28 of 32
+   rulings were batch. The gate report states its batch share beside the accounting, so the
+   weakness is visible where the ruling is taken and not only in the register afterwards.
+
+**This presupposes a ruling register exists, and §2 makes the entry step create it**: a single
+file, one row per ruling, each with an identifier, the question, the answer, **the mode it was
+taken in**, who ruled and the date. Without it, rules 2, 3 and 5 have nothing to check against —
+and the register is also what tells a later session which decisions may not be re-litigated, and
+what makes a gate visible to a resume.
+
+### A question reserved for a person is put in the person's language
+
+⛔ **The questions a method reserves for a human are the ones most at risk of being put in machine
+shorthand**, because by the time they are reached the agent has been speaking the record's language
+for hours. Observed: the one gate question the command forbids the agent to answer was put as a
+six-row table of identifiers and record fields to a ruler who had taken fifty rulings without
+pausing — and who answered the rest of the batch, then said of that one: *it is unclear to me
+exactly what each of these does.* A gate item is put to a person, not to the record; **if it cannot
+be decided without re-reading the derivation, it has not been put yet.**
+
+So a gate item the agent may not answer is put **in plain words with a worked example**. Minimum,
+per candidate: the situation today · what changes · whose hour is saved · whose hour is created ·
+what the demonstration shows · and one concrete example each of what *yes* and *no* would look like
+in the room. The identifier table accompanies it and never replaces it. The reviewer's gate check
+asks: *is each reserved item decidable by a reader who has not opened the artefacts?*
 
 ### When two rulings contradict, ask whether one object is being made to satisfy both
 
@@ -361,7 +488,23 @@ resolution instead of re-asking. Weight the two rulings by their mode (rule 5).
 
 Run the reviewer **after every stage, before the next begins**, on that stage's artefact and the
 artefact it names as input. It runs in its own context, so it costs the human reading and
-nothing else. **Write each pass to disk** — it is the only record the pass happened.
+nothing else. **Write each pass to disk** — it is the only record the pass happened. ⛔ **And
+write a stub the moment the reviewer is spawned** — the pass file with a header and `Status:
+running`, replaced by the findings on completion — because a reviewer killed partway through by a
+host rate limit leaves no record at all, and an absent file cannot distinguish *never ran* from
+*found nothing* from *died on its first tool call*. The filesystem is the only state this method
+trusts; give the interrupted pass a shape it can see.
+
+⛔ **A reviewer pass has two levers on its finding count — what it reads and what it runs on — and
+only one may move between passes if either count is to stay interpretable.** A subagent that
+declares no model inherits the session's, and an inherited setting is not a constant; it is a
+variable nobody wrote down. Twenty-two passes on one run were compared as a band before any of
+them recorded the model it ran on. So **every pass header carries a `Model:` row beside its
+`Read:` line.** Recording the variable is nearly free and is what makes leaving it free to move a
+safe choice rather than an invisible one. Where a cheaper model is considered for the reviewer,
+note that the reviewer is the one subagent run often enough for a downgrade to save anything and
+the one whose findings are the product — so the saving lands exactly where a capability drop costs
+most.
 
 **Point it at the artefact and the inputs the artefact names, and let it open the rest by
 lookup.** The pass's cost is its reading, and on one run that reading grew with every stage
@@ -438,9 +581,32 @@ artefacts does not protect the *next* one. **Read a flat rate as evidence that p
 is still necessary at the end of a chain, never as evidence the reviewer is padding — and do not
 set a declining rate as a goal, because a rate that falls may mean the reviewer was narrowed.**
 
+⛔ **And findings do not track how much the stage derived.** The unstated assumption under the
+band above was that a light stage would be cheap to review. The thirteenth pass on that run
+falsified it: an entry-path declaration — no traversal, no scoring, only inherited figures and a
+path decision — returned 13 findings in 11 minutes, none discarded on sorting. A step that only
+quotes and inherits is doing the one thing this method's defects concentrate in: carrying a claim
+across a boundary, where hedges drop, counts go stale and provenance is asserted. **Budget a
+reviewer pass per stage boundary, not per kilobyte** — roughly ten to fifteen minutes and roughly a
+dozen findings whatever the stage is made of — and do not insert a "light" stage to tidy a join on
+the assumption that it is free. Through 32 passes on three arcs, on two plugin versions, two
+reading budgets and a 64 KB page, the band held.
+
+⚠ **Generated artefacts invert the ratio below.** The rebuild figures in this section were measured
+on hand-written artefacts. On four consecutive stages produced by a generator script, the rebuild
+took 2–6 minutes and the reviewer pass 13–16: **review is then the largest phase**, because a
+finding against a generated table is a one-line change to the generator and a re-run. State which
+kind of stage a published figure was measured on, or the wiring page will plan the wrong phase.
+
 **Commit per stage-phase — produce / review / rebuild — so the split stays measurable.** It
 costs one timestamp per boundary and is the only way the ratio can be known; reconstructed
-afterwards the three phases are indistinguishable. ⛔ **And never write a duration you did not
+afterwards the three phases are indistinguishable. ⚠ **That presupposes the phases are
+sequential.** The rational move while a reviewer runs is to draft the next stage's generator, and
+the moment an agent does that the commit timestamps still exist and still look like boundaries —
+but stage N+1's produce span has moved inside stage N's review span, and the timings file records a
+real figure that measures a script run. **Where work on stage N+1 begins before stage N's review
+returns, the timings rows of both stages record the overlap and stage N+1's produce span reads
+`not separable — authored during stage N's review`.** ⛔ **And never write a duration you did not
 measure.** A timings file is an instrument, and a reconstructed figure wearing the word
 *measured* corrupts it silently — no reviewer pass can catch this, because a reviewer reads an
 artefact against its inputs and **a timestamp has no input.** Take timings from the commit log,
@@ -460,7 +626,10 @@ sponsor's identity was captured at intake** — require the field.
 `confronted`.** It is the same author attacking their own work through a persona: simulated
 challenge reliably finds internal inconsistency and reliably misses the thing the author did not
 know. Only the second needs a person. **If its report retires the conversation with a
-practitioner, it has made the work worse.**
+practitioner, it has made the work worse.** ⛔ **And there is no fourth marker.** One run wrote
+`confronted · proxy` into a register because the three-value scale had no place for the proxy's
+own statements; the place is `position`. What the proxy asserts about the sponsor is the author's
+inference wearing a persona, and a worksheet row resting on it rests on a position.
 
 ### Method review and stance review are different questions, not different depths
 
@@ -546,8 +715,43 @@ run's caveat register went from nine rows to six with no number stated anywhere 
 section that declared shortening forbidden — and only a row-by-row diff against the source found
 it.
 
+⛔ **A pointer is not a placement, and a truncation is a paraphrase.** The sweep counts an element
+placed only when its content is reproduced at the destination; *"see `orders.md` §4"* is a
+pointer, and nine of them passed one run's sweep as placements. A cell cut to a fixed length with
+an ellipsis is a paraphrase the count-based verifier cannot see, because qualifications live in the
+tail of a sentence and identity lives at its head — on the same run the cuts removed *it
+contradicts the proposition itself* and *SC4 is not re-added*, so a criterion vanished from the page
+while every count reconciled. **A quoted cell is reproduced in full or is not quoted.**
+
 Add a pre-flight box: **every load-bearing element of every input has a destination or a stated
 exclusion.**
+
+### The verification clause — a check is only as independent as its denominator
+
+⛔ **A verifier whose expected set comes from a file the same author wrote for the same page
+confirms consistency, not completeness.** Observed: a page's completeness check was *transitive* —
+the expected rulings were the ids named in the author's outline — so when a late ruling was applied
+to the page without an outline edit, the page lacked it and the check passed. The denominator had
+moved with the numerator. And a check implemented as the author's numbers typed into the script and
+compared to the page is the drafting computation run twice. So the specification's verification
+clause requires:
+
+1. **Two denominators for every completeness check** — the author's map *and* a register the
+   author did not write for this page (every ruling id in the register must have a row; every
+   assumption cited must exist in the frame).
+2. **Expected counts derived from the page's own rows or from an upstream file, never from a
+   literal**, and a list of every number word in the prose that no derivation covers, so the
+   coverage denominator is visible.
+3. ⭐ **The verifier ships with the list of mutations it was shown.** A verifier that has never
+   been handed a wrong page is a script that agrees with its author. Before a verification stage is
+   called done, single defects are applied to a copy of the artefact — drop a row, un-strike a
+   withdrawn clause, swap two citations, change a count by one, add a second version string,
+   remove a source attribute — and the ones the verifier passes are findings. On the run this rule
+   comes from, the reviewer built that harness on its own initiative and seven of its ten findings
+   came from it; the verifier had passed a dropped ruling, an un-struck clause and five untested
+   counts, and its output read `ALL CHECKS PASS`. **An instrument is reviewed by what it fails to
+   catch, not by what it reports.** §4's reviewer contract names the mutation pass for
+   verification stages.
 
 ---
 
@@ -564,7 +768,22 @@ stages cite its identifier and a deleted ID is an unresolvable reference.
 ⚠ **Never mint a second set of IDs for something already identified.** Where one command
 inherits another's output it adopts those identifiers, **and records in the artefact header
 that it did** — the reader cannot otherwise tell derived work from inherited, and the
-difference changes what the output may claim.
+difference changes what the output may claim. ⛔ **The same holds column by column.** A table
+that mixes inherited fields with fields authored at this step — a trigger derived here beside a
+verifier carried from upstream — marks which is which and states the rule that produced the
+authored ones; authored fields inside an inherited table are the least examined content in the
+artefact, because the rows around them carry the source's authority.
+
+⛔ **Verbatim is a property of bytes, not of intent.** An agent transcribing prose normalises it —
+capitalises an opening, corrects a typo — and calls the result verbatim; on one run a ruled
+proposition was written into three files within fifteen minutes and produced three different
+strings, each labelled verbatim, with the project's *verbatim, untidied* rule in the loaded
+instructions while it happened. A rule against tidying has no moment at which it fires. So **text
+that later stages must quote verbatim is written to one file and every other location cites it, or
+the same edit copies it with a byte-compare assertion** — `grep -cF` of the exact string across the
+files, the expected count printed in the commit — and the reviewer's contract keeps the cross-file
+byte comparison of quoted fields as a standing check. An intake field that must be verbatim says
+*paste; do not retype*.
 
 ### A hazard named without a trigger is discharged by being mentioned
 
@@ -605,11 +824,29 @@ In a repo that commits per stage, the commit is the hook because it already happ
 
 > ⛔ **A stage is not complete until its commit carries all of:** the artefact and its reviewer
 > pass · its row in the timings file, **taken from commit timestamps or written `not measured`** ·
-> any observations about the method, **or an explicit written `none for this stage`** · and the
-> resume document updated. **The commit message names them.**
+> any observations about the method, **or an explicit written `none for this stage`** · the
+> resume document updated · **and the identifier grep: the series the stage minted, checked
+> against the registry, or an explicit `no new series`.** **The commit message names them.**
 
 ⛔ **Require the explicit "none".** Silence may not pass for compliance — it is
 indistinguishable from the convention having been forgotten, which is what actually happens.
+
+⛔ **A hook that rides on a commit is silent for the commit a session never makes.** Observed: a
+produce commit was made with a message naming neither timings nor observations — the hook fired
+and was ignored — and the session then stopped between produce and review, so the commit that would
+have carried the timings row, the observation line and the open gate items was never made. The
+obligation anchored on *finishing a session at a gate* never matched, because the session finished
+between two phases. Two moves, and both phrase the trigger as a condition on the record rather
+than on the session:
+
+1. **The close-out is asserted at the next action that must happen, not only at the one that
+   should have.** Before producing stage N+1, or launching its reviewer, assert that stage N's
+   commit message names the close-out items, that the timings file has a stage-N row, and that
+   every item a stage-N artefact carried to a gate appears in the resume document — and fail
+   loudly if not. A resume-time assertion runs in the session that exists; a session-end
+   obligation runs in the one that may not.
+2. **The resume-document obligation's trigger is *an artefact carried an item to a gate*** —
+   checkable by grep — never *the session ended at a gate*, which nothing can check.
 
 ⚠ **This holds even when the convention is the reason the project exists, and even for an agent
 that has just written down the general form of the failure.** That is the observed case, in the
@@ -650,19 +887,31 @@ stated per hook, not waved through because the first one was harmless.
 must measure the human stages separately from the machine ones.** Without it the arc cannot be
 scheduled against a client commitment and there is no way to tell a slow run from a normal one.
 
-⛔ **But publish only what the instrument can actually see.** A timings file that reads commit
-timestamps measures **agent phases** honestly — they are bounded by tool activity, and it does not
-matter who was at the desk. It cannot measure a **human phase** at all: the span between a gate
-opening and a ruling contains deliberation, absence, and **platform waits such as a rate limit
-resetting**, and nothing in the timestamps separates them.
+⛔ **But publish only what the instrument can actually see, and classify a span by what happened
+inside it, never by who was nominally responsible for it.** An earlier version of this rule
+quarantined spans *across a human* and exonerated agent phases as *bounded by tool activity*. A
+host rate limit falsified that: a reviewer pass was spawned, made one tool call, died on a 429,
+and resumed 145 minutes later when the limit reset — a single stage's produce-to-review span now
+holds two hours of which perhaps three minutes were work, and nothing in the commit log
+distinguishes it from an expensive pass. *An agent was running* is not evidence that time was
+spent working, only that nobody was asked a question. So: **quarantine any span containing a
+platform wait, whoever was waiting** — rate limits, quota resets, API errors stretch agent phases
+as readily as absence stretches human ones. A stage whose reviewer pass was retried records the
+failed attempt as its own line marked `platform wait — not separable`, and the measured pass is the
+successful attempt alone. The stub pass file (§4) is what makes the failed attempt visible on disk.
+**An entry gate taken inside a host's plan mode is un-timeable by design** — the guards, the
+candidates, the ruling and the first write share one span with no commit inside it — and the
+published expectation says so rather than offering a produce figure for the entry.
 
 Observed on one full arc, and offered as a starting expectation rather than a standard:
 
 | Phase | Observed | Trustworthy? |
 |---|---|---|
-| A stage artefact | 10–20 min | ✅ Bounded by tool activity |
-| A reviewer pass | 7–10 min, **trending up** as each pass reads more of the chain | ✅ |
-| Applying a pass's findings (the rebuild) | **10–13 min, and the largest phase** | ✅ |
+| A stage artefact, hand-written | 10–20 min | ✅ Bounded by tool activity, **unless the span holds a platform wait** |
+| A stage artefact, generated | 2–6 min once the generator exists — and the generator's authoring span is usually inside the previous stage's review (§4) | ⚠ Only if the overlap is recorded |
+| A reviewer pass | 7–10 min on an unbudgeted reviewer; **13–16 min on a reading budget, flat with artefact length** — it scales with what the artefact cites | ✅ |
+| Applying a pass's findings (the rebuild) | **10–13 min on a hand-written artefact, and the largest phase; 2–6 min on a generated one, where review is the largest** | ✅ |
+| The entry gate inside plan mode | ⛔ **`not separable`** | Guards, candidates, ruling and first write in one span with no commit inside it |
 | Intake | ⛔ **`not separable`** | Elapsed 250 min, but it contains platform waits. **What is evidenced is that the two decision fields failed three consecutive passes** — not a duration |
 | A gate | ⛔ **`not separable`** | Elapsed up to ~2 hours. **Attention was a fraction of it and nothing recorded which fraction** |
 
@@ -697,12 +946,18 @@ quotable.**
 - [ ] The operating mode — commissioned or targeted — is declared in the intake, and the gates are phrased for it
 - [ ] A synthetic or specimen path exists, and it records itself in the frame
 - [ ] The host's read-only planning mode, where one exists, covers the guards, the entry gate and the resume report, ends before the first stage, and its approved plan is copied into the ruling register before any other write
+- [ ] Plan mode on a resume fires on a context boundary; a resume after a gate ruled this session does not re-enter it
+- [ ] The entry step creates the ruling register, the identifier registry and the timings file before stage 1
+- [ ] A resume re-runs the guards and compares the plugin version to the entry artefact; every stage header records the version
 - [ ] Every host mechanism the method depends on — a hook, a subagent, a template — ships inside the package, or the command says it does not, and a guard checks for it
 
 **State and resume**
 
 - [ ] Every stage leaves an artefact, and the resume map names each one
 - [ ] Gates not sitting after a stage are listed, and a resume onto one stops there
+- [ ] The resume joins completed stages to the register, and stops at any completed stage whose following gate has no rulings on file
+- [ ] Every arc has its own reviewer directory, named in the command where the write is defined
+- [ ] Any stage or gate that mints a series opened the registry first, and a continued series read its maximum from the registry
 - [ ] Reviewer pass filenames carry the orchestrator's stage identifier, and their headers record both schemes
 - [ ] A stage with an artefact and no reviewer file is raised as a question, not silently re-run
 - [ ] Every open item in the resume document states the condition that closes it
@@ -714,22 +969,33 @@ quotable.**
 - [ ] A ruling register exists, and every gate report reconciles escalations in against rulings out
 - [ ] No gate report carries a "not rulings" category
 - [ ] No downstream step cites a ruling identifier absent from the register
-- [ ] Every register row records the mode the ruling was taken in — chosen from options, batch authorisation, or declined
+- [ ] Every register row records the mode the ruling was taken in — chosen from options, batch authorisation, declined, batch on a corrected description, or requires a choice
+- [ ] Every gate row carries exactly one recommended answer or is marked *requires a choice*; the accounting counts both, and the gate report states its batch share
+- [ ] Any mark on a carried item is the ruler's, recorded in the register; the artefact says only *put*
+- [ ] Every question the agent may not answer is put in plain words with a worked example
 - [ ] A contradiction gate offers *both stand once split* as a third outcome, and does not re-ask a choice already made this session
 
 **Review**
 
-- [ ] The reviewer runs after every stage and writes its pass to disk
+- [ ] The reviewer runs after every stage and writes its pass to disk, and a stub is written when it is spawned
+- [ ] Every pass header records the model beside what it read
+- [ ] On a verification stage the reviewer ran a mutation pass, and the verifier names the mutations it was shown
 - [ ] The reviewer's contract includes the backward check — no artefact asserts what a later artefact records as withdrawn
 - [ ] Any proxy pass is capped at `confronted · internal` in the artefact carrying it
 - [ ] A proxy pass runs against the frame, before the traversal commits to a scope and a unit
 - [ ] Produce / review / rebuild are committed separately, and no timing is written that was not measured
+- [ ] Any overlap of stage N+1's authoring with stage N's review is recorded in both timings rows
+- [ ] Any span containing a platform wait is marked not separable, whoever was waiting
 
 **Specification and close-out**
 
 - [ ] The specification is itself reviewed before anything is built against it
 - [ ] The omission sweep ran: every load-bearing element of every input has a destination or a stated exclusion
+- [ ] No placement in the sweep is a pointer, and no quoted cell is truncated
+- [ ] Every completeness check names two denominators, and every expected count is derived, never typed
+- [ ] Verbatim text lives in one file and is cited, or every copy was byte-compared in the same edit
 - [ ] The sweep is shaped one section per input with a count per input, and a sweep that removed nothing is marked unapplied
 - [ ] Every hazard names the step that tests it and what the test is, and every discharge names its instance
-- [ ] The close-out list is named in each stage's commit message, with an explicit `none` where there is nothing to record
+- [ ] The close-out list is named in each stage's commit message, with an explicit `none` where there is nothing to record, including `no new series`
+- [ ] Stage N's close-out is asserted before stage N+1 is produced
 - [ ] Counts stated in the command's prose match the tables beneath them

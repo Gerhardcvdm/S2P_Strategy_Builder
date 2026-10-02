@@ -229,21 +229,21 @@ a{text-underline-offset:.18em;text-decoration-thickness:from-font}
       <dt>Skill</dt>
       <dd>
         <p class="reg-what">Knowledge the model loads when the work matches. It runs nothing and sequences nothing, which is why the shared discipline lives here instead of being copied into each command.</p>
-        <p class="reg-ex">function-to-strategy-derivation · use-case-portfolio-derivation · derivation-orchestration · analytical-document-build · html-style · arc-watcher</p>
+        <p class="reg-ex">function-to-strategy-derivation · use-case-portfolio-derivation · derivation-orchestration · analytical-document-build · html-style · arc-watcher · storyline-review</p>
       </dd>
     </div>
     <div class="reg-row" style="--c:var(--command)">
       <dt>Command</dt>
       <dd>
-        <p class="reg-what">A procedure you trigger by name. It has a fixed entry, a fixed sequence, and it holds the gates. There are three, one per deliverable, each with one audience.</p>
-        <p class="reg-ex">/build-strategy · /build-portfolio · /build-recommendation</p>
+        <p class="reg-what">A procedure you trigger by name. It has a fixed entry, a fixed sequence, and it holds the gates. There are three, one per deliverable, each with one audience, and a fourth that reads the chain they produced backwards.</p>
+        <p class="reg-ex">/build-strategy · /build-portfolio · /build-recommendation · /review-storyline</p>
       </dd>
     </div>
     <div class="reg-row" style="--c:var(--agent)">
       <dt>Subagent</dt>
       <dd>
         <p class="reg-what">A separate head with its own context and its own tool budget. Its work costs you the reading of its findings and nothing else.</p>
-        <p class="reg-ex">strategy-critic · stakeholder-proxy</p>
+        <p class="reg-ex">strategy-critic · stakeholder-proxy · storyline-reviewer</p>
       </dd>
     </div>
     <div class="reg-row" style="--c:var(--hook)">
@@ -257,7 +257,7 @@ a{text-underline-offset:.18em;text-decoration-thickness:from-font}
       <dt>Plugin</dt>
       <dd>
         <p class="reg-what">Ships commands, skills, subagents and hooks as one versioned unit you can install. The repo root is the plugin root, so there is no second copy of anything in this repo.</p>
-        <p class="reg-ex">s2p-strategy 0.5.0 &#183; /s2p-strategy:build-strategy</p>
+        <p class="reg-ex">s2p-strategy 0.7.0 &#183; /s2p-strategy:build-strategy</p>
       </dd>
     </div>
   </dl>
@@ -448,6 +448,7 @@ a{text-underline-offset:.18em;text-decoration-thickness:from-font}
   </figure>
   <div class="spine">
     <p><strong>Why the gates are batched.</strong> Rulings arriving one at a time are what consume a person's day, whatever the analysis costs. A gate presents every open decision at that point, each with a recommendation and what it costs to go the other way, and takes them in a single pass.</p>
+    <p><strong>Where the storyline review sits.</strong> Not on the diagram, because it is not a stage of the run but a reading of it. Once two of the storyline stages exist, <code>/review-storyline</code> reads the chain backwards, drafts a verdict on every handoff between consecutive stages, and puts each one to you as a question with options. Its two gates are yours and nothing in it is a deliverable.</p>
     <p><strong>Where plan mode is on.</strong> The dashed marker under the left edge of each command, bracketing only its entry and its first gate tick. The command's first action is to ask for the host's read-only mode, and the mode stays on through the guards and the entry gate: Gate 0 for the strategy, P1 for the portfolio, R1 for the recommendation. The entry report is the plan; approving it is what makes the first write legal, and that write is the ruling register. On a resumed run the resume report is the plan instead, so you see where the command thinks it is before it touches a file. It ends before stage 1 and is never re-entered at a mid-arc gate, where a read-only mode would block the reviewer's file and the stage commit.</p>
   </div>
   <div class="sub" id="mech">
@@ -516,16 +517,19 @@ a{text-underline-offset:.18em;text-decoration-thickness:from-font}
       <tr><td>derivation-orchestration</td><td><span class="kind skill">skill</span></td><td>The discipline the three commands share: the guards, resuming from artefacts instead of a state file, batching and reconciling gates, running the reviewer and proxy passes, markers and identifiers, committing per stage, and publishing what an arc costs.</td></tr>
       <tr><td>analytical-document-build</td><td><span class="kind skill">skill</span></td><td>Builds a long analytical document from an explicit chain of evidence and keeps it honest as it grows: derived figures are printed from the record, counts the prose asserts are re-read against the tables, and a ruling is propagated through every instrument it touches.</td></tr>
       <tr><td>html-style</td><td><span class="kind skill">skill</span></td><td>The page style every deliverable is built in: palette, type scale and components, with hard rules that keep each document self-contained, print-safe and readable in both themes.</td></tr>
-      <tr><td>arc-watcher</td><td><span class="kind skill">skill</span></td><td>Renders where a run stands from the files on disk: every stage and gate of the three arcs, what is done, which gate is open and what waits on it, which gates were ruled and which merely passed, which reviewer passes are missing, an approximate percentage complete, and the close-out state, as one page, <code>RUN-PROGRESS.html</code>. A Stop hook regenerates it at the end of every agent turn. It holds no state and is git-ignored; the page is a view of the files, never a record. Added 2026-09-11; the map was tested against a completed run and corrected 2026-09-12.</td></tr>
+      <tr><td>arc-watcher</td><td><span class="kind skill">skill</span></td><td>Renders where a run stands from the files on disk: every stage and gate of the three arcs, what is done, which gate is open and what waits on it, which gates were ruled and which merely passed, which reviewer passes are missing, an approximate percentage complete, and the close-out state, as one page, <code>RUN-PROGRESS.html</code>. Since 0.7.0 the map also carries a <code>storyline</code> column naming the stage each row begins, which is what the storyline review reads. A Stop hook regenerates it at the end of every agent turn. It holds no state and is git-ignored; the page is a view of the files, never a record. Added 2026-09-11; the map was tested against a completed run and corrected 2026-09-12.</td></tr>
+      <tr><td>storyline-review</td><td><span class="kind skill">skill</span></td><td>Reads a derivation backwards and judges whether its stages still hang together: one verdict per handoff between consecutive stages (holds, weakens, breaks), one verbatim quotation from each side checked against its file, where the judgment sat at every stage, value followed through, and the weakest link with its smallest repair. Stages come from the arc map. Added 2026-10-02 from the first run of the review.</td></tr>
       <tr><td>strategy-critic</td><td><span class="kind agent">subagent</span></td><td>Reviews one completed stage against the input it names. Runs the mechanical checks first (counts, partitions, filters that removed nothing, orphaned identifiers), then the craft checks, and reports each defect at the stage that introduced it. It never edits the artefact and never rules; it fires after every stage of all three commands.</td></tr>
       <tr><td>stakeholder-proxy</td><td><span class="kind agent">subagent</span></td><td>Reads the work as the named sponsor would and writes the agenda for the real conversation: ranked questions, each with what breaks if the answer goes the other way. Capped at <code>confronted · internal</code> because it cannot discharge a claim. Runs on the frame before the traversal commits to a scope, on the basis before Gate 6, and before D#3.</td></tr>
+      <tr><td>storyline-reviewer</td><td><span class="kind agent">subagent</span></td><td>Reads the whole chain in its own context and drafts the storyline review record: the stages from the map, the verdicts, the quotations, where the judgment sat, the weakest link. Checks every quotation mechanically before writing. It confronts nothing, reports nothing as ruled, and writes one file.</td></tr>
       <tr><td>/build-strategy</td><td><span class="kind command">command</span></td><td>Runs the strategy arc from <code>intake.md</code> to D#1, the client-facing strategy paper, stopping at nine gates. Both subagents are wired in; intake accepts organisations with no public record.</td></tr>
       <tr><td>/build-portfolio</td><td><span class="kind command">command</span></td><td>Runs the portfolio arc from <code>intake.md</code> and <code>strategy/</code> to D#2, a working instrument, stopping at five gates. Adopts the strategy's identifiers when a strategy exists and traverses the function itself when none does, and says which it did. It never re-traverses a function already traversed.</td></tr>
-      <tr><td>/build-recommendation</td><td><span class="kind command">command</span></td><td>Writes D#3 for the sponsor from D#2 and the ruled first proof: the contract first, then the proxy pass (to its own file, <code>strategy/recommendation-agenda.md</code>, so D#1's agenda is not overwritten), then the document. It derives nothing new, and a claim with no source is recorded as a gap with an owner rather than written as a sentence.</td></tr>
+      <tr><td>/build-recommendation</td><td><span class="kind command">command</span></td><td>Writes D#3 for the sponsor from D#2 and the ruled first proof: the contract first, then the proxy pass (written by the proxy to <code>recommendation/recommendation-agenda.md</code>, the arc's own directory), then the document. It derives nothing new, and a claim with no source is recorded as a gap with an owner rather than written as a sentence.</td></tr>
+      <tr><td>/review-storyline</td><td><span class="kind command">command</span></td><td>Writes the stub, spawns the drafter, then puts every verdict to you as one question per handoff with the two quotations in the question text and the options confirm, enrich, correct. When nothing changed, that count is itself put. Then the weakest link and its smallest repair, named and not made unless you say so. Then the page, built by a script that refuses rather than fakes.</td></tr>
       <tr><td>/rule · /sweep · /wrap-up</td><td><span class="kind command">commands</span></td><td>Project-local helpers, not shipped in the plugin. They commit and never push.</td></tr>
       <tr><td>templates/</td><td><span class="kind files">files</span></td><td><code>intake.md</code> is the form as a real file, with the options inline for every closed-set field, so you can read it and arrive with it filled in. <code>intake-specimen.md</code> is a filled specimen for exercising the arc without a live sponsor. <code>CLAUDE.md</code> is what step 0z writes into the project once Gate 0 is approved.</td></tr>
       <tr><td>hooks/</td><td><span class="kind hook">hooks</span></td><td>Three lifecycle hooks the plugin registers on install. <code>precompact-closeout.sh</code> warns you before a compaction if work is uncommitted or the resume document is behind. <code>sessionstart-resume.sh</code> reads the resume document back into the agent's context after a clear, a compaction or a resume. The arc-watcher's <code>render-progress.sh</code> rewrites the progress page on <code>Stop</code>. All three are idempotent per session, so a second registration does no harm. Added 2026-09-11; until then the first one lived in one machine's settings and shipped nowhere. See <a href="#mech">what fires on its own</a>.</td></tr>
-      <tr><td>the plugin</td><td><span class="kind plugin">package</span></td><td>Ships all of the above as <code>method</code>, currently 0.4.1. The repo root is the plugin root; both manifests pass <code>claude plugin validate --strict</code>.</td></tr>
+      <tr><td>the plugin</td><td><span class="kind plugin">package</span></td><td>Ships all of the above as <code>s2p-strategy</code>, currently 0.7.0. The repo root is the plugin root; both manifests pass <code>claude plugin validate --strict</code>.</td></tr>
     </tbody>
   </table>
   </div>
@@ -584,6 +588,11 @@ a{text-underline-offset:.18em;text-decoration-thickness:from-font}
       <p>The portfolio carries on from the strategy and reuses its numbering. The recommendation only writes up what the portfolio already established and works out nothing new.</p>
       <span class="cmd">/s2p-strategy:build-portfolio
 /s2p-strategy:build-recommendation</span>
+    </li>
+    <li>
+      <h3>Read it backwards before it goes into a room</h3>
+      <p>Once two stages exist, and again when more do. It drafts a verdict on every handoff between stages and asks you about each one, with the two sentences it rests on in the question. Nothing it writes is a deliverable.</p>
+      <span class="cmd">/s2p-strategy:review-storyline</span>
     </li>
   </ol>
 
@@ -648,12 +657,13 @@ a{text-underline-offset:.18em;text-decoration-thickness:from-font}
         <tr><td><strong>1</strong> &middot; traverse</td><td>The five layers, only when no strategy exists</td><td>Skipped when adopted, because Phase 1 of the portfolio is stages 3 to 6 of the strategy. A second traversal mints a second set of identifiers for the same work</td></tr>
         <tr><td><strong>2</strong> &middot; assemble</td><td><code>use-cases.md</code> and <code>filter-log.md</code>, with the arithmetic shown</td><td>One trigger, one output, one verifier per use case. The filter log is exhaustive: assembled plus filtered equals the total, and a filter that removed nothing is reported as unfiltered</td></tr>
         <tr><td><strong>3</strong> &middot; score</td><td><code>positioning-matrix.md</code> and <code>portfolio.md</code></td><td>Each dimension scored separately and kept separate. A collapsed score is a weighting, and the weighting is not the agent's to choose</td></tr>
-        <tr><td><strong>4</strong> &middot; rank</td><td><code>portfolio-ranking.md</code></td><td>Collapses only on Gate P3's ruling, and marks the translation: whose weighting, and that the arithmetic is the agent's</td></tr>
+        <tr><td><strong>4</strong> &middot; rank</td><td><code>portfolio-ranking.md</code></td><td>Collapses only on Gate GP3's ruling, and marks the translation: whose weighting, and that the arithmetic is the agent's</td></tr>
         <tr><td><strong>5</strong> &middot; orders</td><td><code>orders.md</code>: the ranking, the build sequence and the first-proof order, kept apart</td><td>Where two defensible orders disagree, both are published and the disagreement is the finding. Re-ranking is not evidence</td></tr>
         <tr><td><strong>6</strong> &middot; attack</td><td><code>challenge-round.md</code></td><td>The adversarial pass, which states inside the artefact that it discharges nothing. It is the same author attacking their own work, and it exists to surface the questions cheaply</td></tr>
-        <tr><td><strong>7</strong> &middot; select</td><td><code>selection-criteria.md</code>, then <code>demo/prototype-choice.md</code></td><td>Criteria are derived from the constraint that binds the build and named before anything is scored. Every finalist is re-costed at full load, because marginal sizing from D#1 presupposes a foundation the first proof does not have</td></tr>
-        <tr><td><strong>8</strong> &middot; deliverable</td><td><code>deliverables/agentic-use-case-portfolio.html</code></td><td>Every number that changes register on the way in is re-read. A hedged estimate in a working file becomes a confident finding when it is promoted to a headline</td></tr>
-        <tr><td><strong>9</strong> &middot; stop check</td><td><code>stop-check.md</code></td><td>The stop condition, box by box. The last box, a claim confronted by someone who works there, stays unticked, and the portfolio says it is a well-built hypothesis until then</td></tr>
+        <tr><td><strong>7</strong> &middot; select</td><td><code>selection-criteria.md</code>, then <code>portfolio/demo/prototype-choice.md</code></td><td>Criteria are derived from the constraint that binds the build and named before anything is scored. Every finalist is re-costed at full load, because marginal sizing from D#1 presupposes a foundation the first proof does not have</td></tr>
+        <tr><td><strong>8</strong> &middot; stop check</td><td><code>stop-check.md</code></td><td>The stop condition, box by box. The last box, a claim confronted by someone who works there, stays unticked, and the portfolio says it is a well-built hypothesis until then</td></tr>
+        <tr><td><strong>8s</strong> &middot; specification</td><td><code>deliverables/SPEC-D2.md</code></td><td>The contract for the page, reviewed before anything is built against it: the omission sweep one section per input, the record format, and the verification the page owes about itself. A finding against a specified page is an edit; against an unspecified one it is a re-derivation</td></tr>
+        <tr><td><strong>9</strong> &middot; deliverable</td><td><code>deliverables/agentic-use-case-portfolio.html</code></td><td>Every number that changes register on the way in is re-read. A hedged estimate in a working file becomes a confident finding when it is promoted to a headline</td></tr>
       </tbody>
     </table>
 
@@ -665,6 +675,26 @@ a{text-underline-offset:.18em;text-decoration-thickness:from-font}
         <tr><td><strong>P3</strong></td><td>The weighting: whose is it, and what are the weights? Nothing collapses until this is answered.</td><td>A ranking collapsed on the agent's weighting is presented as the sponsor's preference</td></tr>
         <tr><td><strong>P4</strong></td><td>The attack landed <em>N</em> findings. Which need a ruling before the selection?</td><td>The same hazard as Gate 7. A simulated challenge that reads like confrontation retires the conversation with a practitioner</td></tr>
         <tr><td><strong>P5</strong></td><td>Does this candidate prove the argument, or only that the technology works? Has this room already seen it demonstrated three times? And the criteria, before anything is scored.</td><td>A plausible guess about saturation removes the strongest candidate. Criteria written after the scoring are a rationalisation nobody can tell from one</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="sub">
+    <h3>Storyline · <code>/review-storyline</code> · 2 stages, 2 gates</h3>
+    <p>Not an arc. A reading of the arcs, at any point with two or more storyline stages on file. The unit is the handoff between consecutive stages, never the stage.</p>
+    <table class="stat">
+      <thead><tr><th>Stage</th><th>What it produces</th><th>Why it exists</th></tr></thead>
+      <tbody>
+        <tr><td><strong>0</strong> &middot; guards</td><td>The map has a <code>storyline</code> column; two or more stages are on file; the drafter is installed; <code>storyline/</code> and its register created</td><td>Fewer than two stages is nothing to join. The map is the only source of stages, so a new artefact needs a map row, not a code change</td></tr>
+        <tr><td><strong>1</strong> &middot; the draft</td><td><code>storyline/storyline-review.md</code>, written by the drafter over a stub the command wrote first</td><td>The stage table from git, where the judgment sat, one verdict per handoff with a verbatim sentence from each side, value followed through, the weakest link. Every quotation checked against its file before the record is written</td></tr>
+        <tr><td><strong>5</strong> &middot; the page</td><td><code>storyline/storyline-review.html</code></td><td>Built by a script from the record, the map, git and an optional calendar. Every figure on it is computed; where one cannot be, the exhibit is omitted and the page says so. It refuses an empty verdict, a quotation that no longer matches, or a count the record and the files disagree on</td></tr>
+      </tbody>
+    </table>
+    <table class="stat" style="margin-top:28px">
+      <thead><tr><th>Gate</th><th>What you are asked</th><th>If it goes wrong</th></tr></thead>
+      <tbody>
+        <tr><td><strong>GS1</strong></td><td>Per handoff, one call: does this verdict hold, with both quotations in front of you (confirm, enrich, or correct to each other value), and whose decision was the downstream stage: joint, the agent's accepted as presented, or yours. Then, if nothing changed, whether that count is your ruling</td><td>A draft that survives untouched has not been tested. Prose inviting you to correct it is satisfied by silence</td></tr>
+        <tr><td><strong>GS2</strong></td><td>The weakest handoff, the cause in the stage that owns it, and the smallest repair. Confirm it and leave it named, change the repair, name a different link, or have it made now</td><td>A repair made unasked edits a closed arc's artefact on the agent's judgment. Named, it is a line in the record and an open item in the resume document</td></tr>
       </tbody>
     </table>
   </div>

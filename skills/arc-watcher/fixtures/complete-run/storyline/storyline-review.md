@@ -1,0 +1,3 @@
+# Storyline review — Clinical Trials Network · Clinical Research operations
+
+| **Input** | the bundled `arc-map.tsv` of s2p-strategy 0.7.0 (development install) · every stage artefact in §1 · `git log` — read whole: the 17 markdown artefacts of `strategy/`, `portfolio/`, `portfolio/demo/`, `recommendation/`, `deliverables/SPEC.md` Part III and both confrontation worksheets; `handoff.md` §4 (the D#1 rulings, 1–10 and R1–R28) in full and the rest by lookup; `deliverables/SPEC-D2.md` §0–§2; the three HTML deliverables by grep for their load-bearing sentences; `intake.md`, `IDENTIFIERS.md` and `storyline/rulings.md` for the header and the identifier series |

@@ -75,10 +75,12 @@ the deliverable may claim, not whether the work can start.**]
 ⚠ **The expensive one.** Building for two sponsors and later collapsing to one forces every driver
 to be re-tagged or dropped.]
 
-**Mandate, verbatim:** [free text, and **verbatim matters** — exactly as given, untidied. Gate 1
-asks whether the sponsor would recognise the restatement as theirs, and that check is worthless
-against a mandate already smoothed. In `targeted` mode: the mandate as inferred, with **the
-evidence it was inferred from**, labelled as inferred.]
+**Mandate, verbatim:** [free text, and **verbatim matters** — exactly as given, untidied. **Paste
+it; do not retype it** — a retyped sentence gets its capitals and its typos corrected on the way,
+and every later file that quotes this one is byte-compared against it. Gate 1 asks whether the
+sponsor would recognise the restatement as theirs, and that check is worthless against a mandate
+already smoothed. In `targeted` mode: the mandate as inferred, with **the evidence it was inferred
+from**, labelled as inferred.]
 
 **Trigger:** [what caused this now — or the literal word `unknown`, which is a sanctioned answer
 and better than a guess.]

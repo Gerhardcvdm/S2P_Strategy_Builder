@@ -72,6 +72,18 @@ pressure to keep it.
 **Before executing an instrument, list its structural constraints and test them
 pairwise for conflict against a few real cases.**
 
+⛔ **Draw those cases from every population the instrument will run over.** A rule written from
+one population's cases has no defined value on another's; it has a default the author supplies
+without deciding to. Observed across three consecutive stages of one run, each caught by the
+reviewer and each on the boundary between the same two populations: an assembly rule applied
+strictly to AI opportunities and loosely to registers; an input-state rule read against the input
+for thirty-one records and against the output for four; one identical verifier clause scored
+`mechanical` on one member of a class and `mixed` on two. The pairwise test had run and had
+missed it, because every test case came from the population the rule was written for. **So: at
+least one case from each population before scoring, and per rule a note of which population's
+case it was written from.** Where a generator holds the record, assert for each derived dimension
+that its distribution is not explained by population alone.
+
 When a conflict appears, **report it as a finding about the instrument
 alongside the output** — state which constraint you favoured and what that
 cost. Do not silently resolve it.
@@ -221,6 +233,18 @@ group under-counted by four, another wrongly including a record whose own entry 
 groups. The grouping presented everywhere as the largest was not, the whole reuse argument pointed
 at the wrong thing, and it had reached two published deliverables.
 
+⛔ **A count quoted from upstream for reconciliation carries a definition, and the reconciliation
+runs under that definition or not at all.** Observed: an upstream foot stated *13 of 23 rest wholly
+on weak or uncited pains*; the downstream column derived the grade per record as the *worst* among
+an entry's pains and reconciled to 14. Both correct — *wholly* counts entries with no cited pain,
+*worst* counts entries with any — and only a generator assertion made the difference visible; the
+page would otherwise have printed 14 beside a source saying 13 with no reason on view. Where the
+downstream aggregation differs from the upstream one (worst · best · any · all), hold both values
+on every record and assert the upstream figure on the rule it was computed under, stated beside it.
+**A number reconciles only under a named aggregation rule**; two correct counts under different
+rules disagree, and a reconciliation that does not name the rule fails for no visible reason or
+passes by coincidence.
+
 **Re-derivation runs against the leaf records, never against an intermediate summary, however
 authoritative repetition has made it.** Where a summary table is the input to further work,
 re-derive the whole table and diff it row by row before building on it, and state in the new
@@ -243,6 +267,14 @@ reveal absence iterates the set that defines what *should* be present — the re
 the population — never the set of artefacts produced. If a missing item shrinks the denominator,
 the count cannot report absence and must not be presented as coverage.
 
+⛔ **A completeness check whose expected set comes from a file the same author wrote for the
+same page confirms consistency, not completeness.** Observed: a page's annexe of rulings was
+checked against the ruling ids named in the author's own outline; a late ruling applied to the page
+without an outline edit left the annexe short by one and the check passed. **Name two denominators
+for every completeness check** — the author's map *and* a register the author did not write for
+this page — and derive every expected count from the artefact's own rows or an upstream file, never
+from a literal typed into the checker. A check is only as independent as its denominator.
+
 ⛔ **And a figure that reports absence renders at zero.** Rendering it only when non-zero is the
 same defect one level up: a reader who does not see the figure cannot tell *zero* from *never
 computed*, and a regression that stops computing it produces a page identical to a healthy one.
@@ -260,6 +292,17 @@ would not reconcile, **a parenthetical explaining the discrepancy written faster
 Parse the finished artefact, compute every derived figure, and assert a partition — categories sum
 to the total, no overlaps, nothing missing — before publishing. **A reconciliation note explaining
 why numbers do not add up is a defect signal, never a fix.**
+
+⛔ **A membership, an attribution or a comparison stated in prose is a derived figure.** Generation
+moves the defect one token to the right: the counts reconcile and the adjective beside them is the
+weakest thing on the page. Observed on two consecutive generated stages, the second after the first
+was found: *every one is route 0*, *the only agentic entry*, *B ranks last* — memberships and
+comparisons typed as string literals inside the generator's templates, beside correctly computed
+figures, under a header reading *nothing hand-written*. *Every X is Y* is a count of X that are not
+Y, and it is zero or the sentence is false: print it from the record. And **the header of a
+generated artefact says what is generated and what is not** — *figures and memberships computed;
+sentences are the author's* — because *nothing hand-written* is prose, can only be true of a file
+with no prose, and is the first sentence to check.
 
 ⛔ **When a self-reported figure is found wrong, replace the method, not the number.** Observed: a
 document asserted 41 claims and held 46; the rebuild correcting it asserted 48 and held 58. The
@@ -553,6 +596,17 @@ source, and does the new phrasing carry the confidence that source supports?
 **Where the honest answer is a range or an unknown, say so.** Declining to
 assert is always available and usually stronger than picking the midpoint.
 
+⛔ **Truncation and pointing are the two other ways a promoted artefact says less than its
+source, and a count-based verifier cannot see either.** A cell cut to a fixed length with an
+ellipsis so the table fits the screen is a paraphrase: qualifications live in the tail of a sentence
+and identity lives at its head, so every identifier and count still matches while *it contradicts
+the proposition itself*, *SC4 is not re-added* and a superseded criterion's replacement are gone.
+Observed on a page whose own verifier passed. And *see `orders.md` §4* is a pointer, not a
+placement: nine of one run's omission-sweep placements were pointers and were counted as placed.
+**A quoted cell is reproduced in full or is not quoted; width is a layout problem and is solved
+with horizontal scrolling, never by cutting content.** For every table that quotes a register, diff
+each cell against its source in full — not by prefix, not by count.
+
 **Worked example.** A hedged estimate carried from a working file into a
 client-facing document became a section headline, losing the hedge and gaining
 the authority of a deliverable. An upstream document already held a firmer,
@@ -776,6 +830,8 @@ Re-read this list and check the output against it.
       explicit and recorded
 - [ ] The instrument's structural constraints were tested pairwise for conflict,
       and any conflict is reported as a finding
+- [ ] Every rule was tested on a case from each population it runs over, and names the
+      population it was written from
 
 **Recording decisions:**
 
@@ -802,6 +858,12 @@ Re-read this list and check the output against it.
       records and never an intermediate summary**
 - [ ] Every count names its denominator, and any count meant to reveal absence iterates the
       set that defines what should be present
+- [ ] Every completeness check names two denominators, one of them a register the author did
+      not write for this artefact; no expected value is a typed literal
+- [ ] Every count quoted from upstream for reconciliation names the aggregation rule it was
+      computed under, and both values are held where the rules differ
+- [ ] Every membership, attribution or comparison in prose is printed from the record, and a
+      generated artefact's header says what is typed
 - [ ] Every figure that reports absence renders at zero
 - [ ] No count or set membership was hand-written; the partition check ran; no prose
       absorbs a discrepancy
@@ -847,6 +909,8 @@ Re-read this list and check the output against it.
 
 - [ ] Every quantity re-sourced, not copied
 - [ ] No hedge silently upgraded by a change of register
+- [ ] No quoted cell is truncated, no placement is a pointer, and every quoted cell was diffed
+      against its source in full
 - [ ] Every statement attributing a decision, preference or knowledge to the
       client names the artefact it came from, and the client is actually its source
 - [ ] The deliverable was grepped for second-person constructions, and each hit

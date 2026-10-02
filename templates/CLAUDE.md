@@ -43,7 +43,10 @@ out and the gap is named, never filled by inference.
 |---|---|---|---|
 | D#1 | `/s2p-strategy:build-strategy` | `deliverables/` — the client-facing strategy paper | `intake.md` |
 | D#2 | `/s2p-strategy:build-portfolio` | `deliverables/…-use-case-portfolio.html` | `intake.md` + `strategy/` |
-| D#3 | `/s2p-strategy:build-recommendation` | `deliverables/…-build-recommendation.html` | D#2 + `portfolio/demo/prototype-choice.md` |
+| D#3 | `/s2p-strategy:build-recommendation` | `deliverables/…-build-recommendation.html` | D#2 + `portfolio/demo/prototype-choice.md` + `portfolio/stop-check.md` |
+| — | `/s2p-strategy:review-storyline` | `storyline/` — the review record and its page, **not a deliverable** | the arc map + two or more storyline stages on file, at any point in the run |
+
+**The review is not an arc.** It reads the chain backwards at any point with two or more stages on file, judges the handoffs between stages, and puts every verdict to you as a question with options. Run it before a deliverable goes into a room, and again when more stages exist.
 
 **Each consumes the one before it and never re-derives it.** A later arc that quietly rebuilds its
 own evidence is a second opinion wearing the first one's clothes — and it will disagree with the
@@ -57,13 +60,18 @@ resumes from the filesystem; **there is no state file, and there must never be o
 | Path | Holds |
 |---|---|
 | `intake.md` | The eight fields. Root. Manual. |
-| `strategy/` | `frame.md`, `frame-agenda.md`, the three maps, drivers, opportunity map, sizing, basis, `sponsor-agenda.md`, `approach-review.md`, and D#3's `recommendation-agenda.md` |
+| `IDENTIFIERS.md` | The identifier registry: every series in play, its prefix, range and owner. Created at Gate 0; **opened before any series is named** |
+| `RUN-TIMINGS.md` | The timings file, one row per stage-phase from commit timestamps or `not measured`. Created at Gate 0 |
+| `strategy/` | `frame.md`, `frame-agenda.md`, the three maps, drivers, opportunity map, sizing, basis, `sponsor-agenda.md`, `approach-review.md`, and `rulings.md`, D#1's ruling register — the owner of the central proposition |
 | `strategy/critic/` | D#1's reviewer findings, one per **command stage** — see that directory's `README.md` |
 | `client/` | Stage 2 public-record research and its grade |
 | `portfolio/` | D#2's working files and `rulings.md`, its ruling register |
 | `portfolio/critic/` | D#2's reviewer findings, one per stage. ⛔ Not `strategy/critic/`: both arcs have stages 2 to 5 and a shared directory overwrites D#1's passes |
-| `portfolio/demo/` | `prototype-choice.md` — the ruled first proof |
-| `deliverables/` | `SPEC.md` and the HTML documents |
+| `portfolio/demo/` | `prototype-choice.md` — the ruled first proof; the path `/build-recommendation`'s guard tests |
+| `recommendation/` | D#3's working files: `recommendation-outline.md`, `recommendation-agenda.md`, `rulings.md`, `tools/` |
+| `recommendation/critic/` | D#3's reviewer findings, one per stage. ⛔ Its own directory, for the same reason |
+| `deliverables/` | `SPEC.md` (Parts I and III), `SPEC-D2.md` (Part II) and the HTML documents |
+| `storyline/` | `storyline-review.md`, the review record; `rulings.md`, its register (`GS<gate>-R<n>`); `storyline-review.html`, the page built from the record; `calendar.tsv`, optional. ⛔ Not `deliverables/`: the record carries no version and no marker |
 | `RUN-PROGRESS.html` | **Derived, git-ignored, regenerated on every agent turn** by the `arc-watcher` hook: where the run stands, from the files above. Open it in a browser; never edit it, never commit it, never cite it as a source |
 
 **Artefacts declare their own stage in their header. That is how resume works — do not add a state
@@ -82,16 +90,18 @@ time, and deleting it loses nothing.
   anything. Each deliverable says so on its face and carries a confrontation worksheet with an empty
   ruling column.
 
-## ⛔ Step close-out — four things, named in the commit message
+## ⛔ Step close-out — five things, named in the commit message
 
-**A stage is not complete until its commit carries all four:**
+**A stage is not complete until its commit carries all five, and stage N's close-out is asserted
+before stage N+1 is produced** — a commit hook is silent for the commit a session never makes:
 
 | | What | If there is nothing to record |
 |---|---|---|
-| 1 | The **artefact** and its reviewer pass in `strategy/critic/<stage>.md` | — |
-| 2 | Its row in **`RUN-TIMINGS.md`** — **from commit timestamps, never reconstructed** | Write `not separable` and why |
+| 1 | The **artefact** and its reviewer pass in the arc's own `critic/` directory | — |
+| 2 | Its row in **`RUN-TIMINGS.md`** — **from commit timestamps, never reconstructed**; an overlapped phase or a platform wait is marked | Write `not separable` and why |
 | 3 | Any **observations about the method** | ⛔ **Write an explicit `none for this stage`** |
-| 4 | **`handoff.md`** updated, every open item carrying the condition that closes it | — |
+| 4 | **`handoff.md`** updated whenever an artefact carried an item to a gate, every open item carrying the condition that closes it | — |
+| 5 | The **identifier grep** against `IDENTIFIERS.md` for every series the stage minted | ⛔ **Write an explicit `no new series`** |
 
 ⛔ **The explicit "none" is required.** Silence may not pass for compliance — it is indistinguishable
 from the convention having been forgotten, which is what actually happens.

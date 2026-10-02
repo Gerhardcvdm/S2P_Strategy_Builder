@@ -1,7 +1,7 @@
 {
   "name": "s2p-strategy",
-  "description": "S2P Strategy Builder. Derive an agentic transformation strategy, a use case portfolio and a build recommendation from a business function. Three orchestrating commands, one per deliverable, each stopping at gates only a person can rule.",
-  "version": "0.5.0",
+  "description": "S2P Strategy Builder. Derive an agentic transformation strategy, a use case portfolio and a build recommendation from a business function. Three orchestrating commands, one per deliverable, each stopping at gates only a person can rule, and a storyline review that reads the chain backwards.",
+  "version": "0.7.0",
   "author": {
     "name": "Gerhard van der Merwe"
   },

@@ -216,8 +216,10 @@ changes.
 **`Sponsor` is the expensive one.** Building for two sponsors and later collapsing to one
 forces every driver to be re-tagged or dropped. Ask which it is before stage 4, not after.
 
-**`Mandate, verbatim` must be verbatim.** Gate 1 asks whether the sponsor would recognise the
-restatement as theirs. That check is worthless against a mandate already smoothed.
+**`Mandate, verbatim` must be verbatim — pasted, not retyped.** Gate 1 asks whether the sponsor
+would recognise the restatement as theirs. That check is worthless against a mandate already
+smoothed, and an agent or a person transcribing prose smooths it without noticing; where the field
+is later quoted, the quotation is byte-compared against this file (`derivation-orchestration` §7).
 
 **`Organisation` does not require a public record.** A privately held company, a subsidiary that
 files nothing, a partnership, a firm that has never issued a release — all are in scope. Stage 2
@@ -309,8 +311,14 @@ person producing the wrong answer is the person the definition did not reach:
 2. **Could the named sponsor answer *"no, that is not where our problem is"*?**
 
 ⚠ **Later steps quote this sentence; they never paraphrase it** — including the criterion that
-selects what gets built and the claim the deliverable has to prove. Record it **verbatim, on its
-own line, in `strategy/frame.md`**. And ⛔ **do not read the argument off the traceability later**:
+selects what gets built and the claim the deliverable has to prove. ⛔ **Its owner is the ruling
+register row** — `strategy/rulings.md`, ruling 0.1, written verbatim as the first write after
+approval; `strategy/frame.md` quotes it *from* the row and cites the row, and so does every later
+arc. A ruling that later strikes or replaces the sentence is a new register row and a strike in
+place where it was quoted; the row is what a later command reads. *(Before 0.6.0 the frame and the
+intake form were each named as the single source, and the first ruling that moved the sentence
+exposed the split — the frame's primary quotation was the struck one.)* And ⛔ **do not read the
+argument off the traceability later**:
 when downstream items are tagged to positions it is tempting to take the argument to be whichever
 position the most items point at. **Mass tells you where the work concentrated, not what the work
 is claiming.** The human names it; the counts do not.
@@ -325,9 +333,22 @@ onward takes its unit from this answer — the function's tasks, its failures, i
 that: because no stage can see past its own unit.** Discovering it wrong at stage 6 costs the whole
 chain. ⭐ **The cheapest detector that it is wrong: a process that produces zero pains.**
 
-**Both rulings are recorded in the frame with who made them.** ⛔ **In synthetic mode the agent may
-supply both — and `strategy/frame.md` must record that it did**, because a deliverable that later
-says *"you told us"* about an agent-written field hands the reader a sentence they can flatly deny.
+**Both rulings are recorded in the register with who made them and the mode**, and the frame
+records the same. ⛔ **In synthetic mode the agent may supply both — and `strategy/frame.md` must
+record that it did**, because a deliverable that later says *"you told us"* about an agent-written
+field hands the reader a sentence they can flatly deny.
+
+⛔ **A proposition the agent drafted and the person waved through is re-put at Gate 1, in plain
+words, before anything quotes it.** *Go with the defaults* on an agent-drafted candidate is a
+batch authorisation of the agent's text, and the register says so; it is legal, and it is the
+weakest mode. On the run this comes from, such a sentence was quoted verbatim through twenty-one
+stages and thirteen gates, owned the first screen of the strategy paper, and became a filter that
+removed half the portfolio — then the first person to read it in plain words at the second arc's
+fifth gate set it aside in a paragraph. Every check had recorded the exposure; none could arrest
+it, because recording is not arresting. So Gate 1 carries, as its first item whenever ruling 0.1's
+mode is not *chosen from written options* or *written by the person*: the sentence, one paragraph
+on what it commits the chain to, and the question *is this the claim, in your words?* The frame's
+deviation entry stays; this is the step that acts on it.
 
 **How the gate is put as the plan.** Write the Gate 0 report — the candidates for 0.1 with their
 costs, the binary for 0.2 with what each makes the traversal blind to, the engagement mode read from
@@ -342,10 +363,18 @@ resume reads it; a ruling that exists only there is a ruling from memory.
 
 ### 0z. Write the project instruction file, if it is absent
 
-**After Gate 0 is approved and before stage 1** — it is the first write of the run — write `CLAUDE.md`
-in the repository root from `templates/CLAUDE.md`, substituting from the intake: organisation,
-function and slug, sponsor, engagement mode, and — ⛔ **quoted verbatim, never paraphrased** — the
-data boundary and the client processing permission.
+**After Gate 0 is approved and before stage 1**, immediately after the register rows for 0.1 and
+0.2, write `CLAUDE.md` in the repository root from `templates/CLAUDE.md`, substituting from the
+intake: organisation, function and slug, sponsor, engagement mode, and — ⛔ **quoted verbatim,
+never paraphrased** — the data boundary and the client processing permission.
+
+**In the same step, the other two entry artefacts** (`derivation-orchestration` §2): `IDENTIFIERS.md`
+in the repository root, seeded with every series this arc mints — `R<gate>-` rulings, `A` assumptions,
+`P` positions, `S` sector statements, `C` capabilities, `L` caps, `W` weaknesses, `Q` gate questions,
+`OPP-`, `NON-`, `VD-`, the pain and task prefixes — each with its owner and range, so a later arc or
+gate opens it before naming anything; and `RUN-TIMINGS.md`, header only, which every stage's commit
+adds a row to. Three artefacts that rules depend on and no step created were, on the observed run,
+all invented by hand mid-arc.
 
 ⛔ **Only if it is absent.** If a `CLAUDE.md` already exists:
 
@@ -381,13 +410,18 @@ state is derivable. Read the function slug from the intake's `Function` field, t
 ls strategy/ strategy/critic/ client/ deliverables/ 2>/dev/null
 ```
 
-**On a resumed run this step is in plan mode too.** Call `EnterPlanMode`, read the artefacts, and
-write the resume report as the plan: the stage each artefact maps to, the computed resume point,
-which gate a resume onto that point must stop at first, and any stage holding an artefact with no
-critic file. `ExitPlanMode` puts it to the person; approval exits plan mode and the run proceeds to
-the named point. A wrong resume point re-runs finished work or skips a gate, and this is the one
-cheap moment to catch it. **A single-stage invocation (`/build-strategy 5`) takes the same shape**:
-the plan names what stage 5 will overwrite.
+**On a run resumed across a context boundary this step is in plan mode too.** Call `EnterPlanMode`,
+read the artefacts, and write the resume report as the plan: the stage each artefact maps to, the
+computed resume point, which gate a resume onto that point must stop at first, and any stage holding
+an artefact with no critic file. `ExitPlanMode` puts it to the person; approval exits plan mode and
+the run proceeds to the named point. A wrong resume point re-runs finished work or skips a gate, and
+this is the one cheap moment to catch it. **A single-stage invocation (`/build-strategy 5`) takes
+the same shape**: the plan names what stage 5 will overwrite. ⛔ **A resume that follows a gate
+ruled in this session does not re-enter plan mode** — the register holds the rulings, nothing was
+lost, and re-putting them as a plan teaches the person the checkpoint is a formality
+(`derivation-orchestration` §1). **Every resume re-runs step 0a's guards and compares the plugin
+version against the one `frame.md` recorded**; on a mismatch, note the change in the next stage's
+header and the timings file, and every stage header records the version it ran under.
 
 Map artefacts to stages: `frame.md`→1 · `frame-agenda.md`→1p · `client/`→2 · `*-pain-map.md`→3 ·
 `*-value-drivers.md`→4 · `ai-applicability-framework.md`→5 · `*-opportunity-map.md`→6 ·
@@ -422,13 +456,20 @@ run is not re-read; its defects were already ruled on.
 **Resume at the stage after the highest artefact present.** Report the resume point before
 doing any work. If a stage number was passed as an argument, run that stage only.
 
-⚠ **Four gates do not sit after a stage, and a resume lands past all of them.** Gate 0 precedes
-stage 1, Gate 4 precedes stage 4, Gate 8 precedes stage 10, and **Gate 6 sits between stage 8 and
-stage 9**, behind the 8p proxy pass that feeds it. Running from the start you reach them in order.
-**Resuming *into* stage 1, 4, 9 or 10 skips them silently**, because the resume rule points at a
-stage and a gate is not a stage. So: if the computed resume point is 1, 4, 9 or 10, put that gate
-first and stop on it before producing anything — and at 9, run the 8p proxy pass first, because
-Gate 6 is not answerable without it. The same applies to `/build-strategy 1`, `4`, `9` and `10`.
+⛔ **No gate is visible to this scan, and the register is what makes them visible.** A stage that
+was produced, critiqued and rebuilt looks exactly like one that was also ruled on; approval leaves
+no trace on the thing approved. So the resume is a join: for each completed stage, is a gate defined
+after it, and does `strategy/rulings.md` carry that gate's rows? **A completed stage with a gate
+after it and no rows on file is a stop** — the resume lands on that gate and produces nothing until
+it is ruled. ⚠ **Four gates additionally do not sit after a stage, and a resume lands past all of
+them by construction.** Gate 0 precedes stage 1, Gate 4 precedes stage 4, Gate 8 precedes stage
+10, and **Gate 6 sits between stage 8 and stage 9**, behind the 8p proxy pass that feeds it. If the
+computed resume point is 1, 4, 9 or 10, put that gate first and stop on it before producing
+anything — and at 9, run the 8p proxy pass first, because Gate 6 is not answerable without it. The
+same applies to `/build-strategy 1`, `4`, `9` and `10`. *(Before 0.6.0 only these four were named;
+a run paused at an ordinary post-stage gate with seven rulings open would have been resumed past it,
+and only the hand-maintained resume document stopped it — the tell, below, that the mechanism had
+already broken.)*
 
 The scan above covers all **fifteen** mapped artefacts plus the critic files. **If a stage writes
 outside the directories this `ls` names, the scan stops being complete and the resume point
@@ -491,7 +532,7 @@ right.
 | Gate | After | The question |
 |---|---|---|
 | **0** | Step 0a | The central proposition, and who the transformation is for. **Candidates offered; you rule.** |
-| **1** | Stage 1 | *Commissioned:* would the sponsor recognise this restated mandate as theirs? *Targeted:* is it defensible enough to put in front of them cold? |
+| **1** | Stage 1 | *Commissioned:* would the sponsor recognise this restated mandate as theirs? *Targeted:* is it defensible enough to put in front of them cold? **And first, whenever ruling 0.1 was not chosen from written options: the proposition re-put in plain words — is this the claim, in your words?** |
 | **2** | Stage 2 | Is this the right entity · is every source public · the record graded *G* — proceed on labelled `sector` material, on an empty `client/`, or do you supply internal material inside the data boundary? |
 | **3** | Stage 3 | Does this look like the function? **Recognition is not evidence** — a nod means plausible, not true. |
 | **4** | Before stage 4 | One sponsor or several, and what are they measured on? |
@@ -525,13 +566,19 @@ and resolving citations.**
    the decision set while looking accepted. Observed: a live defect filed under *"not rulings —
    stated so they are not mistaken for open"* passed three further gates untouched, and every later
    artefact called it *carried* — which reads as though a human had accepted it. **Nobody had ever
-   been asked.**
+   been asked.** An item kept outside the rulings is *put for* a mark, and **the mark is the
+   ruler's** — an artefact that prints *accepted* beside its own agenda item has taken the ruling.
 5. ⛔ **The register records *how* each ruling was taken** — *chosen from written options*, *batch
-   authorisation of the agent's recommendation*, or *declined*. An authorisation of recommendations
-   not yet written is closer to *proceed on your judgement* than to a decision, so **a later choice
-   from written options supersedes it without a stop; the reverse direction stops.** Observed: the
-   same five decisions answered *"take your recommendations"* once and from written options once,
-   and one reversed with no new evidence between. `derivation-orchestration` §3.
+   authorisation of the agent's recommendation*, *declined*, *batch on a corrected description*, or
+   *requires a choice — not yet taken*. An authorisation of recommendations not yet written is
+   closer to *proceed on your judgement* than to a decision, so **a later choice from written
+   options supersedes it without a stop; the reverse direction stops.** Observed: the same five
+   decisions answered *"take your recommendations"* once and from written options once, and one
+   reversed with no new evidence between. **Every row carries one recommended answer**, or it is
+   marked *requires a choice* and a batch answer cannot cover it; the accounting counts both and the
+   report states its batch share. `derivation-orchestration` §3.
+6. ⛔ **A question the agent may not answer is put in plain words with a worked example** — never
+   as a table of identifiers. `derivation-orchestration` §3.
 
 ### 4. Stage 2 — research, the record grade, and the boundary
 
@@ -681,15 +728,16 @@ say so in the document.**
 field — role, what they are measured on, what they have already seen. Without it you get a generic
 sceptic, and a generic sceptic is worth nothing here.
 
-**1p — on the frame, before stage 2.** Write `strategy/frame-agenda.md`. ⭐ **This is the only
+**1p — on the frame, before stage 2.** The proxy writes `strategy/frame-agenda.md` itself — give it
+the path with the identity; do not transcribe its report. ⭐ **This is the only
 mechanism in the method that can surface a constraint nobody thought of while it is still cheap to
 act on.** The critic asks a **closed** question — are the counts right, was the instrument applied,
 did a quoted position keep its clauses — so it can only find defects the chain's own vocabulary can
 express, and **everything the chain never thought to ask about stays invisible however many passes
 run.** The proxy asks an **open** one: what would the person on the other side need to be true.
 
-**8p — on the strategy basis, before Gate 6.** Write `strategy/sponsor-agenda.md`, then fold it
-into Gate 6's batch — it is what makes that gate answerable in one pass instead of three.
+**8p — on the strategy basis, before Gate 6.** The proxy writes `strategy/sponsor-agenda.md`; fold
+it into Gate 6's batch — it is what makes that gate answerable in one pass instead of three.
 
 ⚠ **The strongest marker either output may support is `confronted · internal`. Never plain
 `confronted`.** It is the same author attacking their own work through a persona: simulated
@@ -802,9 +850,10 @@ on, each with where it is used, what breaks if it is false, and an empty ruling 
   the finding.
 - **DO NOT delete anything a ruling drops.** Mark it dropped in place — later stages cite
   its identifier, and a deleted ID becomes an unresolvable reference.
-- **DO NOT mint an identifier series without checking it against every series already in play.**
-  One run had `S1`–`S3` as gate rulings and `S1`–`S32` as sector statements simultaneously, in
-  artefacts that quote each other.
+- **DO NOT mint an identifier series without opening `IDENTIFIERS.md` first.** One run had
+  `S1`–`S3` as gate rulings and `S1`–`S32` as sector statements simultaneously, in artefacts that
+  quote each other; the registry exists because of that and is consulted at the moment of naming,
+  and the stage commit names the series minted or says `no new series`.
 - **DO NOT publish the deliverable via the Artifact tool.** Write it to the repo.
 - **DO NOT push.** Stage and commit locally after each stage; pushing is the user's.
 
@@ -844,7 +893,7 @@ If the host has no plan mode, or the person declines to enter it:
 
 ## Committing — and the close-out that makes conventions survive
 
-⛔ **A stage is not complete until its commit carries all four:**
+⛔ **A stage is not complete until its commit carries all five:**
 
 | | What | If there is nothing to record |
 |---|---|---|
@@ -852,8 +901,17 @@ If the host has no plan mode, or the person declines to enter it:
 | 2 | Its row in the **timings file** — produce · review · rebuild · gate wait, **from commit timestamps, never reconstructed** | Write *"not separable"* and why |
 | 3 | Any **observations about the method** | ⛔ **Write an explicit `none for this stage`** |
 | 4 | The **handoff / resume document** updated, every open item carrying the condition that closes it | — |
+| 5 | The **identifier grep** — every series the stage minted, checked against `IDENTIFIERS.md` | ⛔ **Write an explicit `no new series`** |
 
-**The commit message names 2, 3 and 4.** ⭐ **The commit is the hook because it already happens.**
+**The commit message names 2, 3, 4 and 5.** ⭐ **The commit is the hook because it already happens
+— and it is silent for the commit a session never makes**, so **before producing stage N+1 or
+launching its critic, assert stage N's close-out**: its commit message names the items, the timings
+file has its row, and every item a stage-N artefact carried to a gate appears in the resume
+document. The resume-document obligation's trigger is *an artefact carried an item to a gate*,
+which a grep can check — never *the session ended at a gate*, which nothing can. Observed: a
+session ended between produce and review with the produce commit naming nothing, and the gate
+items it had carried appeared nowhere until the next session found them by accident.
+`derivation-orchestration` §8.
 
 ⛔ **Require the explicit "none".** Silence may not pass for compliance — it is indistinguishable
 from the convention having been forgotten, which is what actually happens. Observed: a timing
@@ -902,9 +960,10 @@ days in one machine's `~/.claude/settings.json` while this file printed a one-li
 already diverged — present where it was least needed, absent everywhere the plugin travelled, and the
 only record of it was the author's memory. So: **the scripts live in `hooks/`, this file points at
 them and copies nothing**, and step 0a checks that a `PreCompact` hook is registered. The development
-install (`adapters/claude/install.ps1`) registers the same two files in user settings; if both the
-plugin and the junction install are active the warning appears twice, which is harmless and is how
-you know.
+install (`adapters/claude/install.ps1`) registers the same files in user settings; if both the
+plugin and the junction install are active every hook is registered twice, and each script is
+idempotent per session and event so the second fire exits before doing anything — the resume
+document is injected once, not twice.
 
 ⚠ **Say which of these the host actually supports.** A method depending on a lifecycle event the
 host does not expose fails silently, which is the same shape as the reviewer that never ran.
